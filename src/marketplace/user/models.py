@@ -42,8 +42,6 @@ class User(Base):
     is_phone_number_confirm: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
-
-
 class CompanyUserM2M(Base):
     __tablename__ = "company_user_m2m"
 

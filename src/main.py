@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from src.core import redis as aioredis, redis
 from src.config import app_configs, settings
+from src.marketplace.main import app as marketplace_app
 
 
 @asynccontextmanager
@@ -43,3 +44,6 @@ app.add_middleware(
 @app.get("/healthcheck", include_in_schema=False)
 async def healthcheck() -> dict[str, str]:
     return {"status": "ok"}
+
+
+app.mount("/api/marketplace", marketplace_app)
