@@ -7,7 +7,7 @@ from dotenv import dotenv_values
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 
-from src.core.database.postgres.metadata import Base
+from src.core.database.postgres import Base
 
 # from src.database import Base
 # from src.auth.models import Base

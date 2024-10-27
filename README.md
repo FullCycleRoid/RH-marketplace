@@ -9,23 +9,23 @@
 2. `docker network create russian-house`
 3. `docker-compose up -d --build`
 
-### Linters
-Format the code with `ruff --fix` and `ruff format`
+### Make migrations
+- Create an automatic migration
 ```shell
-sudo docker compose exec app format
-```
+alembic revision -m "migration_name" --autogenerate
 
-### Migrations
-- Create an automatic migration from changes in `src/database.py`
-```shell
-sudo docker compose exec app makemigrations *migration_name*
 
 ```
 - Run migrations
 ```shell
-sudo docker compose exec app migrate
+alembic upgrade head
 ```
 - Downgrade migrations
 ```shell
-sudo docker compose exec app downgrade -1
+alembic downgrade -1  # or -2 or base or hash of the migration
+```
+
+### Access Redis inside container
+```shell
+docker exec -it app_redis redis-cli -a *redis password*
 ```

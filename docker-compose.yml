@@ -22,12 +22,8 @@ services:
     image: library/postgres:14.1
     env_file:
       - .env
-    volumes:
-      - marketplace_pg_data:/var/lib/postgresql/data
-      - marketplace_data_backups:/backups
-      - ./scripts/postgres:/scripts
     ports:
-      - "15432:5432"
+      - "25432:5432"
 
   marketplace_redis:
     image: redis:6.2-alpine
@@ -37,13 +33,7 @@ services:
       - 'redis-server'
       - '--requirepass myStrongPassword'
     ports:
-      - "16379:6379"
-
-volumes:
-  app_pg_data:
-    driver: "local"
-  app_pg_data_backups:
-    driver: "local"
+      - "26379:6379"
 
 networks:
   default:
