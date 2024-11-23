@@ -7,7 +7,8 @@
 ### First Build Only
 1. `cp .env.example .env`
 2. `docker network create russian-house`
-3. `docker-compose up -d --build`
+3. `pip install -r requirements/dev.txt`  
+4. `docker-compose up -d --build`
 
 ### Make migrations
 - Create an automatic migration

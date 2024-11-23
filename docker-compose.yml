@@ -3,7 +3,7 @@ version: '3.7'
 services:
   marketplace:
     container_name: marketplace
-    image: marketplace_image
+#    image: marketplace_image
     env_file:
       - .env
     build:

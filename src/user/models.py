@@ -32,7 +32,6 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
 
-
     email: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
 
     phone: Mapped[str] = mapped_column(String(20))
