@@ -1,51 +1,13 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
-from redis.asyncio import ConnectionPool
-from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+import uvicorn
 
-from src.core import redis as aioredis, redis
-from src.config import app_configs, settings
-from src.user.main import app as user_app
-from src.company.main import app as company_app
+from src.config import uvicorn_config
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator:
-    pool = ConnectionPool.from_url(
-        str(settings.REDIS_URL), max_connections=10, decode_responses=True
+if __name__ == '__main__':
+    uvicorn.run(
+        'src.app:app',
+        host=uvicorn_config.HOST,
+        port=uvicorn_config.PORT,
+        log_level=uvicorn_config.LOG_LEVEL,
+        reload=uvicorn_config.RELOAD
     )
-    redis.redis_client = aioredis.Redis(connection_pool=pool)
-    yield
-
-    if settings.ENVIRONMENT.is_testing:
-        return
-
-    await pool.disconnect()
-
-
-app = FastAPI(**app_configs, lifespan=lifespan)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
-    allow_origin_regex=settings.CORS_ORIGINS_REGEX,
-    allow_credentials=True,
-    allow_methods=("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"),
-    allow_headers=settings.CORS_HEADERS,
-)
-
-# if settings.ENVIRONMENT.is_deployed:
-#     sentry_sdk.init(
-#         dsn=settings.SENTRY_DSN,
-#         environment=settings.ENVIRONMENT,
-#     )
-
-
-@app.get("/healthcheck", include_in_schema=False)
-async def healthcheck() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-app.mount("/api/user", user_app)
-app.mount("/api/company", company_app)

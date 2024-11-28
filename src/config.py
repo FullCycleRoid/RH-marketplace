@@ -1,42 +1,52 @@
-from typing import Any
-from pydantic import RedisDsn, model_validator
+from dataclasses import dataclass
+from enum import Enum
+
 from pydantic_settings import BaseSettings
-
-from src.core.constants import Environment
-
-
-class Config(BaseSettings):
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str
-    POSTGRES_PORT: str
-    POSTGRES_DB: str
-    DB_ECHO: bool
-
-    REDIS_URL: RedisDsn
-    ENVIRONMENT: Environment = Environment.PRODUCTION
-
-    SENTRY_DSN: str | None = None
-
-    CORS_ORIGINS: list[str]
-    CORS_ORIGINS_REGEX: str | None = None
-    CORS_HEADERS: list[str]
-
-    APP_VERSION: str = "1"
-
-    @model_validator(mode="after")
-    def validate_sentry_non_local(self) -> "Config":
-        if self.ENVIRONMENT.is_deployed and not self.SENTRY_DSN:
-            raise ValueError("Sentry is not set")
-
-        return self
+from typing import List, Tuple
 
 
-settings = Config()
+@dataclass(frozen=True)
+class URLPathsConfig:
+    HOMEPAGE: str = '/'
+    STATIC: str = '/static'
+    DOCS: str = '/docs'
 
-app_configs: dict[str, Any] = {"title": "App API"}
-if settings.ENVIRONMENT.is_deployed:
-    app_configs["root_path"] = f"/v{settings.APP_VERSION}"
 
-if not settings.ENVIRONMENT.is_debug:
-    app_configs["openapi_url"] = None  # hide docs
+@dataclass(frozen=True)
+class URLNamesConfig:
+    HOMEPAGE: str = 'homepage'
+    STATIC: str = 'static'
+
+
+@dataclass(frozen=True)
+class RouterConfig:
+    PREFIX: str
+    TAGS: Tuple[str]
+
+    @classmethod
+    def tags_list(cls) -> List[str | Enum]:
+        return [tag for tag in cls.TAGS]
+
+
+class CORSConfig(BaseSettings):
+    ALLOW_ORIGINS: List[str]
+    ALLOW_HEADERS: List[str]
+    ALLOW_CREDENTIALS: bool
+    ALLOW_METHODS: List[str]
+
+
+class UvicornConfig(BaseSettings):
+    HOST: str = '0.0.0.0'
+    PORT: int = 8000
+    LOG_LEVEL: str = 'info'
+    RELOAD: bool = True
+
+
+class LinksConfig(BaseSettings):
+    HTTP_PROTOCOL: str
+    DOMAIN: str
+
+
+cors_config: CORSConfig = CORSConfig()
+uvicorn_config: UvicornConfig = UvicornConfig()
+links_config: LinksConfig = LinksConfig()

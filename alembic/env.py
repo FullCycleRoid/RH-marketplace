@@ -7,7 +7,7 @@ from dotenv import dotenv_values
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 
-from src.core.database.postgres import Base
+from src.core.database.base import Base
 
 # from src.database import Base
 # from src.auth.models import Base
@@ -32,12 +32,12 @@ target_metadata = Base.metadata
 # ... etc.
 
 if os.getenv('POSTGRES_USER'):
-    DATABASE_URL = f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+    DATABASE_URL = f"postgresql://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
 
 else:
     DOTENV: Path = Path(f'{os.getcwd()}/.env')
     ENVS: Dict[str, str] = dotenv_values(DOTENV)
-    DATABASE_URL = f"postgresql://{ENVS['POSTGRES_USER']}:{ENVS['POSTGRES_PASSWORD']}@{ENVS['ALEMBIC_POSTGRES_HOST']}:{ENVS['ALEMBIC_POSTGRES_PORT']}/{ENVS['POSTGRES_DB']}"
+    DATABASE_URL = f"postgresql://{ENVS['DATABASE_USER']}:{ENVS['DATABASE_PASSWORD']}@{ENVS['ALEMBIC_HOST']}:{ENVS['ALEMBIC_PORT']}/{ENVS['DATABASE_NAME']}"
 
 
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
