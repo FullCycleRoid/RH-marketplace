@@ -1,2 +1,0 @@
-from src.core.database.interfaces.repositories import SQLAlchemyAbstractRepository
-from src.core.database.interfaces.units_of_work import SQLAlchemyAbstractUnitOfWork

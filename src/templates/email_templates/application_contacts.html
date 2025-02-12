@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+    Вы получили контакты по заявке №<a href="{{data['application_detail_url']}}?utm_source=mail_avto" style="color:#38AEFD; ">
+                     {{ data['application_id'] }} {{ data['application_category'] }}
+                </a><br>
+    Заказчик {{ data['company_name'] }} ИНН: {{ data['company_inn'] }}<br>
+    Телефон: {{ data['user_phone'] }} Почта: {{ data['user_email'] }}
+{% endblock %}

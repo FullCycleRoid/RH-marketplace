@@ -1,13 +1,28 @@
 import uvicorn
+from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
-from src.config import uvicorn_config
+from src.auth.router import router as auth_router
+from src.config import app_configs, settings
+
+app = FastAPI(**app_configs)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 
-if __name__ == '__main__':
-    uvicorn.run(
-        'src.app:app',
-        host=uvicorn_config.HOST,
-        port=uvicorn_config.PORT,
-        log_level=uvicorn_config.LOG_LEVEL,
-        reload=uvicorn_config.RELOAD
-    )
+@app.get("/healthcheck", include_in_schema=False)
+async def healthcheck() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+app.include_router(auth_router, prefix="/api/users", tags=["Auth"])
+
+
+if settings.ENVIRONMENT.is_local:
+    uvicorn.run(app=app)

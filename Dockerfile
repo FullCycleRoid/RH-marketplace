@@ -1,7 +1,7 @@
-FROM python:3.10.9-slim-buster
+FROM python:3.11.9-slim-bookworm
 
 RUN apt-get update && \
-    apt-get install -y gcc libpq-dev && \
+    apt-get install -y gcc libpq-dev python3-cffi libcairo2 libcairo2-dev libpango-1.0-0 libpango1.0-dev libpangocairo-1.0-0 libgdk-pixbuf2.0-0 && \
     apt clean && \
     rm -rf /var/cache/apt/*
 
@@ -17,10 +17,6 @@ RUN pip install -U pip && \
 COPY . /src
 ENV PATH "$PATH:/src/scripts"
 
-RUN useradd -m -d /src -s /bin/bash app \
-    && chown -R app:app /src/* && chmod +x /src/scripts/*
+RUN chmod +x /src/scripts/*
 
 WORKDIR /src
-USER app
-
-CMD ["./scripts/start-dev.sh"]

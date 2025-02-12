@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+<table style="width: 100%; border-spacing: 0;">
+    <!-- Header -->
+    <caption style="background-color: white; padding: 24px 32px;">
+      <table style="width: 100%; background-color: white; padding: 24px 32px;">
+        <tr>
+          <td align="left">
+            <img src='https://i.ibb.co/TWyXT7s/logo.png' alt=""/>
+          </td>
+          <td align="right">
+            <a style="text-decoration: none;" href="{{ data['base_url'] }}/personalAccount/profile?utm_source=mail_avto" target="_blank">
+              <span style="font-size: 13px; color: #808185; vertical-align: 1px;"><b>Личный кабинет</b>
+              </span>
+               <img alt="" style="vertical-align: bottom;" src="https://i.ibb.co/qJsWXjx/arrow.png">
+            </a>
+          </td>
+        </tr>
+      </table>
+    </caption>
+    <!-- Header -->
+
+    <tbody style="background-color: #F5F5F5; color: #1D1E21">
+      <tr>
+        <td style="padding:32px;">
+          <table
+            style="width: 100%; background: linear-gradient(160deg, #F27C83 -0.35%, #FFE3E9 85.26%);border-radius: 16px; padding:24px">
+            <tr>
+              <td style="height: 50px;" valign="top">
+                <span style="font-size: 22px;">
+                  <b>
+                    Отклики по комиссинной<br />схеме недоступны
+                  </b>
+                </span>
+              </td>
+              <td rowspan="3" align="right">
+                <img alt="" style="height: 138px;" src="https://i.ibb.co/D9YN9Ng/decline-2.png">
+              </td>
+            </tr>
+            <tr>
+              <td style="height: 30px; padding-bottom: 12px;" valign="top">
+                <span style="font-size: 13px;">
+                  Свяжитесь с менеджером портала для устранения<br />причин отказа в модерации
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td valign="bottom" style="padding-bottom: 12px;">
+                <a href="https://t.me/manager21yard?utm_source=mail_avto"
+                  style="font-size: 13px; text-decoration: none; background-color: white; padding:8px 16px; border-radius:12px; color: black">
+                  <b>Связь с менеджером</b>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:0 32px 16px 32px" align="center">
+          <span style="font-size: 20px;">
+            Ваша компания <a href="{{ data['base_url'] }}/personalAccount/companies/about?utm_source=mail_avto" style="color:#38AEFD; ">{{ data['company_name'] }}</a> не прошла модерацию
+          </span>
+         <br />
+         <br />
+          <span style="font-size: 15px;">
+            Компаниям, не прошедшим модерацию, недоступны отклики по <br /> комиссионной схеме и публикация историй
+          </span>
+         <br />
+         <br />
+          <span style="font-size: 15px; font-weight: 650">
+            Все остальные функции, включая бесплатный поиск подрядчиков,<br /> доступны без ограничений
+          </span>
+         <br />
+         <br />
+          <span style="font-size: 15px;">
+            Свяжитесь с менеджером портала для устранения причин отказа.<br />
+            Наиболее частые из них это: отсутствие строительных ОКВЭД,<br />недействующая организация, низкие финансовые показатели
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:0 32px 32px 32px; height: 32px;" align="center">
+          <a href="https://t.me/manager21yard?utm_source=mail_avto"
+            style="color:white;font-size: 13px; text-decoration: none; background-color: #EE505A; padding:8px 16px; border-radius:12px ;">
+            Связь с менеджером
+          </a>
+        </td>
+      </tr>
+    </tbody>
+   <tfoot style="background-color: #404247; width: 100%">
+        <tr>
+          <th style="padding: 24px 32px 16px 32px;">
+            <a href="https://t.me/zakazov_yard?utm_source=mail_avto" target="_blank" style="margin-right: 12px; text-decoration: none;">
+              <img src='https://i.ibb.co/wBTbqKd/telegram.png' />
+            </a>
+            <a href="https://www.youtube.com/channel/UC6ZUOLajKj0rs0gunat8RNw" target="_blank"
+              style="margin-right: 12px; text-decoration: none;">
+              <img src='https://i.ibb.co/yhLqQK2/youtube.png' />
+            </a>
+            <a href="http://wa.me/+79215851520" target="_blank" style=" text-decoration: none;">
+              <img src="https://i.ibb.co/L6hHPcL/whatsapp.png" />
+            </a>
+          </th>
+        </tr>
+        <tr>
+          <td style="padding:0 32px 16px 32px">
+            <table style="font-size: 13px;  font-style: normal; line-height: 16px; border-spacing: 0; ">
+              <thead>
+                <tr style=" color:#AAABAD;">
+                  <td style="padding: 0 16px 8px 0;"><b>Контактные данные</b></td>
+                  <td style="padding: 0 0 8px 0;"><b>Юридический адрес</b></td>
+                </tr>
+              </thead>
+                <tbody>
+                  <tr style=" color:white; vertical-align: bottom; ">
+                    <td style="padding: 0 16px 4px 0;  " valign="top">
+                      <img style="height: 16px;" src='https://i.ibb.co/VY4cvRH/phone.png' />
+                      <a style="color:white !important;   text-decoration: none; vertical-align: top;"
+                        href="tel:+78123895512">+7 (812) 389-55-12</a>
+                    </td>
+                    <td style="padding: 0 0 4px 0; " valign="top">
+                      <span style="vertical-align: top;">194021, Санкт-Петербург, ул. Шателена, д. 9, лит. А, пом.
+                        2-Н</span>
+                    </td>
+                  </tr>
+                  <tr style=" color:white; vertical-align: bottom;">
+                    <td style="padding: 0 16px 0 0; color: white !important; " valign="top">
+                      <img style="height: 16px;" src='https://i.ibb.co/HpXJHrV/email.png' />
+                      <a style="color:white !important;  text-decoration: none; vertical-align: top;"
+                        href="mailto:info@21yard.com">info@21yard.com</a>
+                    </td>
+                    <td style="padding: 0; " valign="top">
+                      <span style="vertical-align: top;">197022, Санкт-Петербург, пр-кт Медиков д. 3А офис 218</span>
+                    </td>
+                  </tr>
+                </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0px 32px 24px 32px; color:#AAABAD; font-size: 11px; ">
+            21Yard ® 2024 ООО "21ГРУПП", ИНН <a style="color:#AAABAD !important">7814595568</a>, ОГРН <a
+              style="color:#AAABAD !important">1137847482486</a>
+          </td>
+        </tr>
+  </tfoot>
+</table>
+
+{% endblock %}
