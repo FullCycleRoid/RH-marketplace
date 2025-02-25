@@ -6,7 +6,7 @@ from typing_extensions import Self
 from src.core.cache.interfaces.repositories import AbstractCacheRepository
 from src.core.cache.redis.repositories import RedisRepository
 from src.core.cache.redis.utils import RedisPoolFactory
-from src.core.interfaces import AbstractUnitOfWork
+from src.core.interfaces.units_of_work import AbstractUnitOfWork
 
 
 class RedisUnitOfWork(AbstractUnitOfWork):

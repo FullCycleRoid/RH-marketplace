@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Optional
 
-from src.core.interfaces import BaseModel
+from src.core.interfaces.models import BaseModel
 
 
 @dataclass
