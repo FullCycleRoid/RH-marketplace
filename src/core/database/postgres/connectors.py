@@ -22,3 +22,11 @@ PsycopgSyncSessionFactory = sessionmaker(
     expire_on_commit=False,
     autocommit=False,
 )
+
+
+def get_db():
+    db = PsycopgAsyncSessionFactory()
+    try:
+        yield db
+    finally:
+        db.close()
