@@ -3,7 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-
 # C extensions
 *.so
 
@@ -86,7 +85,7 @@ ipython_config.py
 .python-version
 
 # pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in versions control.
 #   However, in case of collaboration, if having platform-specific dependencies or dependencies
 #   having no cross-platform support, pipenv may install dependencies that don't work, or not
 #   install all needed dependencies.
@@ -98,6 +97,7 @@ __pypackages__/
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
+celerybeat-schedule.*
 
 # SageMath parsed files
 *.sage.py
@@ -138,3 +138,12 @@ node_modules/
 backup.dump
 backup.dump.gz
 .vscode
+
+# DB backups
+backups/
+
+#Volumes
+mongodb_data/
+
+# SRC files:
+src/sso/security/generate_token.py

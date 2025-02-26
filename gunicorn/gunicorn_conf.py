@@ -1,5 +1,3 @@
-# based on https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker
-
 import multiprocessing
 import os
 
@@ -9,8 +7,8 @@ bind_env = os.getenv("BIND", None)
 
 use_bind = bind_env if bind_env else f"{host}:{port}"
 
-workers_per_core_str = os.getenv("WORKERS_PER_CORE", "1")
-max_workers_str = os.getenv("MAX_WORKERS")
+workers_per_core_str = os.getenv("WORKERS_PER_CORE", "2")
+max_workers_str = os.getenv("MAX_WORKERS", "3")
 web_concurrency_str = os.getenv("WEB_CONCURRENCY", None)
 
 cores = multiprocessing.cpu_count()
@@ -21,7 +19,7 @@ if web_concurrency_str:
     web_concurrency = int(web_concurrency_str)
     assert web_concurrency > 0
 else:
-    web_concurrency = max(int(default_web_concurrency), 2)
+    web_concurrency = max(int(default_web_concurrency), 3)
     if max_workers_str:
         use_max_workers = int(max_workers_str)
         web_concurrency = min(web_concurrency, use_max_workers)

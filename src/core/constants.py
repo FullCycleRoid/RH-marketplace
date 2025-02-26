@@ -1,4 +1,6 @@
-from enum import Enum
+from typing import Tuple, Any, Dict
+from dataclasses import astuple, dataclass
+
 
 DB_NAMING_CONVENTION = {
     "ix": "%(column_0_label)s_idx",
@@ -9,20 +11,22 @@ DB_NAMING_CONVENTION = {
 }
 
 
-class Environment(str, Enum):
-    LOCAL = "LOCAL"
-    STAGING = "STAGING"
-    TESTING = "TESTING"
-    PRODUCTION = "PRODUCTION"
+@dataclass(frozen=True)
+class BaseConstant:
 
-    @property
-    def is_debug(self):
-        return self in (self.LOCAL, self.STAGING, self.TESTING)
+    def to_tuple(self) -> Tuple[Any, ...]:
+        return astuple(self)
 
-    @property
-    def is_testing(self):
-        return self == self.TESTING
+    def to_dict(self) -> Dict[str, Any]:
+        return self.__dict__
 
-    @property
-    def is_deployed(self) -> bool:
-        return self in (self.STAGING, self.PRODUCTION)
+
+class ErrorCode:
+    ACCEPT_CODE_NOT_FOUND = "Код подтверждения не найден"
+    WRONG_ACCEPT_CODE = "Неверный код подтверждения"
+    REDIS_KEY_NOT_FOUND = "Ключ Redis не найден"
+
+
+@dataclass(frozen=True)
+class DatetimeFormats:
+    RUSSIAN: str = '%d.%m.%Y %H:%M:%S'

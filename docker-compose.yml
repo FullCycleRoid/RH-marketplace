@@ -1,41 +1,91 @@
 version: '3.7'
+x-base_build: &x_base_build
+  build:
+    context: .
+    dockerfile: ./Dockerfile
 
 services:
-  marketplace:
-    container_name: marketplace
-    image: marketplace_image
-    env_file:
-      - .env
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./:/src
-    ports:
-      - "8000:8000"
-    depends_on:
-      - marketplace_db
+#  app:
+#    <<: [*x_base_build]
+#    container_name: 21Yard
+#    image: 21yard
+#    env_file:
+#      - .env
+#    volumes:
+#      - ./:/src
+#      - /etc/ssl/21yard:/etc/ssl/certs
+#    command: ["./scripts/start-dev.sh"]
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      - app_db
+#      - app_redis
+#      - mongodb
 
-  marketplace_db:
-    container_name: marketplace_db
-    hostname: marketplace_db
+  rh_db:
+    container_name: rh_db
+    hostname: rh_db
     image: library/postgres:14.1
     env_file:
       - .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./scripts/postgres:/scripts
     ports:
-      - "25432:5432"
+      - "15432:5432"
 
-  marketplace_redis:
+  rh_redis:
     image: redis:6.2-alpine
     hostname: redis
-    container_name: marketplace_redis
+    container_name: rh_redis
+    env_file:
+      - .env
     command:
       - 'redis-server'
-      - '--requirepass myStrongPassword'
+      - --requirepass ${REDIS_PASSWORD}
     ports:
-      - "26379:6379"
+      - "6379:6379"
+
+  rh_celery:
+    <<: [*x_base_build]
+    image: rh_celery
+    container_name: rh_celery
+    depends_on:
+      - rh_redis
+      - rh_celery_beat
+    env_file:
+      - .env
+    command: ["./scripts/celery.sh", "celery"]
+
+  rh_celery_beat:
+    <<: [*x_base_build]
+    image: rh_celery_beat
+    container_name: rh_celery_beat
+    depends_on:
+      - rh_redis
+    env_file:
+      - .env
+    command: [ "./scripts/celery.sh", "beat" ]
+
+  rh_flower:
+    <<: [*x_base_build]
+    image: rh_flower
+    container_name: rh_flower
+    depends_on:
+      - rh_redis
+      - rh_celery
+      - rh_celery_beat
+    env_file:
+      - .env
+    command: [ "./scripts/celery.sh", "flower" ]
+    ports:
+      - "5555:5555"
+
+volumes:
+  pg_data:
+    driver: "local"
 
 networks:
   default:
     external: true
-    name: russian-house
+    name: rh

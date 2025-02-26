@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+ <table style="width: 100%; border-spacing: 0;">
+    <!-- Header -->
+    <caption style="background-color: white; padding: 24px 32px;">
+      <img src='https://i.ibb.co/TWyXT7s/logo.png' />
+    </caption>
+    <!-- Header -->
+
+    <tbody style="background-color: #F5F5F5; ">
+      <tr>
+        <td style="padding:32px;">
+          <table
+            style="width: 100%; background: linear-gradient(106deg, #FEE600 2.29%, #FFF 101.16%);border-radius: 16px; padding:24px">
+            <tr>
+              <td style="height: 50px;" valign="top">
+                <span style="font-size: 22px;">
+                  <b>
+                    Вы получили новый отклик<br />
+                    по заявке
+                  </b>
+                </span>
+              </td>
+              <td rowspan="3" align="right">
+                <img alt="" style="height: 138px;" src="https://i.ibb.co/1LkmQPr/success.png">
+              </td>
+            </tr>
+            <tr>
+              <td style="height: 30px; padding-bottom: 16px;" valign="top">
+                <span style="font-size: 13px; ">
+                  Вы можете отслеживать статус ваших заявок<br /> в разделе "Отклики". Скорее переходите!
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td valign="bottom" style="padding-bottom: 16px;">
+                <a href="{{ data['base_url'] }}/myApplications/{{ data['application_id'] }}/responses?utm_source=mail_avto"
+                  style="font-size: 13px; text-decoration: none; background-color: white; padding:8px 16px; border-radius:12px ;">
+                  <b>Посмотреть отклик</b>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:0 32px 32px 32px" align="center">
+            <span style="font-size: 15px;">
+              Вы получили отклик по заявке №
+                <a href="{{ data['base_url'] }}/myApplications/{{ data['application_id'] }}/responses?utm_source=mail_avto" style="color:#38AEFD; ">
+                    {{ data['application_id'] }}. {{ data['application_work'] }}
+                </a>.
+                Отслеживать количество откликов можно в разделе “Отклики” по конкретной заявке
+          </span>
+        </td>
+      </tr>
+{#        todo: insert html with company info here#}
+      <tr>
+        <td style="padding:0 0 32px 32px; height: 32px;" align="center">
+          <a href="{{ data['base_url'] }}/myApplications/{{ data['application_id'] }}/responses?utm_source=mail_avto"
+            style="font-size: 13px; text-decoration: none; background-color: #FEE600; padding:8px 16px; border-radius:12px ;">
+            <b>Посмотреть отклик</b>
+          </a>
+        </td>
+      </tr>
+    </tbody>
+
+    <tfoot style="background-color: #404247; width: 100%">
+        <tr>
+          <th style="padding: 24px 32px 16px 32px;">
+            <a href="https://t.me/zakazov_yard?utm_source=mail_avto" target="_blank" style="margin-right: 12px; text-decoration: none;">
+              <img src='https://i.ibb.co/wBTbqKd/telegram.png' />
+            </a>
+            <a href="https://www.youtube.com/channel/UC6ZUOLajKj0rs0gunat8RNw" target="_blank"
+              style="margin-right: 12px; text-decoration: none;">
+              <img src='https://i.ibb.co/yhLqQK2/youtube.png' />
+            </a>
+            <a href="http://wa.me/+79215851520" target="_blank" style=" text-decoration: none;">
+              <img src="https://i.ibb.co/L6hHPcL/whatsapp.png" />
+            </a>
+          </th>
+        </tr>
+        <tr>
+          <td style="padding:0 32px 16px 32px">
+            <table style="font-size: 13px;  font-style: normal; line-height: 16px; border-spacing: 0; ">
+              <thead>
+                <tr style=" color:#AAABAD;">
+                  <td style="padding: 0 16px 8px 0;"><b>Контактные данные</b></td>
+                  <td style="padding: 0 0 8px 0;"><b>Юридический адрес</b></td>
+                </tr>
+              </thead>
+                <tbody>
+                  <tr style=" color:white; vertical-align: bottom; ">
+                    <td style="padding: 0 16px 4px 0;  " valign="top">
+                      <img style="height: 16px;" src='https://i.ibb.co/VY4cvRH/phone.png' />
+                      <a style="color:white !important;   text-decoration: none; vertical-align: top;"
+                        href="tel:+78123895512">+7 (812) 389-55-12</a>
+                    </td>
+                    <td style="padding: 0 0 4px 0; " valign="top">
+                      <span style="vertical-align: top;">194021, Санкт-Петербург, ул. Шателена, д. 9, лит. А, пом.
+                        2-Н</span>
+                    </td>
+                  </tr>
+                  <tr style=" color:white; vertical-align: bottom;">
+                    <td style="padding: 0 16px 0 0; color: white !important; " valign="top">
+                      <img style="height: 16px;" src='https://i.ibb.co/HpXJHrV/email.png' />
+                      <a style="color:white !important;  text-decoration: none; vertical-align: top;"
+                        href="mailto:info@21yard.com">info@21yard.com</a>
+                    </td>
+                    <td style="padding: 0; " valign="top">
+                      <span style="vertical-align: top;">197022, Санкт-Петербург, пр-кт Медиков д. 3А офис 218</span>
+                    </td>
+                  </tr>
+                </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 0px 32px 24px 32px; color:#AAABAD; font-size: 11px; ">
+            21Yard ® 2024 ООО "21ГРУПП", ИНН <a style="color:#AAABAD !important">7814595568</a>, ОГРН <a
+              style="color:#AAABAD !important">1137847482486</a>
+          </td>
+        </tr>
+  </tfoot>
+</table>
+
+{% endblock %}

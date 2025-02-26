@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+    С формы обратной связи к администрации пришел вопрос: <br>
+    Сообщение: {{ data['question'] }} <br>
+    E-mail: {{ data['email'] }}
+{% endblock %}

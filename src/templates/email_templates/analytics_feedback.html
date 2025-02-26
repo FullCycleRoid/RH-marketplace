@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+    С формы обратной связи по аналитике пришел вопрос: <br>
+    ФИО: {{ data['full_name'] }} <br>
+    Сообщение: {{ data['question'] }} <br>
+    Контактные данные для связи: {{ data['contacts'] }}
+{% endblock %}

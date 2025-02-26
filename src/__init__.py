@@ -1,3 +1,2 @@
-from src.core.database.base import Base
-from src.user.domain.models import *
-from src.company.models import *
+from .core.database.declarative_base import Base
+from .auth.models import *

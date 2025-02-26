@@ -1,6 +1,9 @@
 default:
   just --list
 
+prod:
+  docker compose -f docker-compose-prod.yml up -d --build
+
 up:
   docker-compose up -d
 
@@ -20,13 +23,13 @@ logs *args:
     docker-compose logs {{args}} -f
 
 mm *args:
-  docker compose exec app alembic revision --autogenerate -m "{{args}}"
+  docker-compose exec app alembic revision --autogenerate -m "{{args}}"
 
 migrate:
-  docker compose exec app alembic upgrade head
+  docker-compose exec app alembic upgrade head
 
 downgrade *args:
-  docker compose exec app alembic downgrade {{args}}
+  docker-compose exec app alembic downgrade {{args}}
 
 ruff *args:
   docker compose exec app ruff {{args}} src
@@ -36,7 +39,7 @@ lint:
   just ruff --fix
 
 backup:
-  docker compose exec app_db scripts/backup
+  docker-compose exec app_db scripts/backup
 
 # examples:
 # "just get-backup dump_name_2021-01-01..backup.gz" to copy particular backup
@@ -45,4 +48,4 @@ mount-docker-backup *args:
   docker cp app_db:/backups/{{args}} ./{{args}}
 
 restore *args:
-    docker compose exec app_db scripts/restore {{args}}
+    docker-compose exec app_db scripts/restore {{args}}
