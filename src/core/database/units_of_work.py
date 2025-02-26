@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from typing_extensions import Self
 
 from src.core.database.postgres.connectors import PsycopgAsyncSessionFactory
-from src.core.interfaces import AbstractUnitOfWork
+from src.core.interfaces.units_of_work import AbstractUnitOfWork
 
 
 class SQLAlchemyUnitOfWork(AbstractUnitOfWork):

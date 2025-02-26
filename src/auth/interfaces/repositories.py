@@ -3,8 +3,8 @@ from typing import List, Optional
 from uuid import UUID
 
 from src.core.database.declarative_base import Base
-from src.core.interfaces import AbstractRepository
 from src.auth.models import RefreshToken, User, UserRole
+from src.core.interfaces.repositories import AbstractRepository
 
 
 class UsersRepository(AbstractRepository, ABC):

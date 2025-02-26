@@ -127,7 +127,6 @@ class SQLAlchemyRefreshTokensRepository(SQLAlchemyRepository, RefreshTokensRepos
 
 
 class SQLAlchemyUserRolesRepository(SQLAlchemyRepository, UserRolesRepository):
-
     async def get(self, id: int) -> Optional[UserRole]:
         result: Result = await self._session.execute(select(UserRole).filter_by(id=id))
         return result.scalar_one_or_none()
