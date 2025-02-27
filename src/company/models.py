@@ -6,17 +6,23 @@ from sqlalchemy.orm import relationship, Mapped
 from uuid import uuid4
 
 from src import Base
-from src.company.enums import CompanyStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, ReportStatus
+from src.company.enums import LegalStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, \
+    ReportStatus, SystemStatus
 
 
 class Company(Base):
     __tablename__ = 'companies'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     country_code = Column(String(2), nullable=False)
-    status = Column(
-        Enum(CompanyStatus, name='company_status'),
+    legal_status = Column(
+        Enum(LegalStatus, name='legal_status'),
         nullable=False,
-        default=CompanyStatus.ON_MODERATION
+        default=LegalStatus.UNKNOWN
+    )
+    system_status = Column(
+        Enum(SystemStatus, name='system_status'),
+        nullable=False,
+        default=LegalStatus.ON_MODERATION
     )
     created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
@@ -31,27 +37,17 @@ class Company(Base):
 
     __table_args__ = (
         Index('idx_company_country_code', country_code),
-        Index('idx_company_status', status),
+        Index('idx_legal_status', legal_status),
     )
 
     def add_legal_field(self, user_id, field_name, field_value, field_type, required=False):
         legal_field = LegalField(
-            company_id=self.id,
-            country_code=self.country_code,
-            version=1,
-            effective_from=datetime.utcnow(),
-            status=FiledStatus.ACTIVE,
-            modified_by=user_id
-        )
-
-        self.legal_fields.append(legal_field)
-        legal_field_value = LegalFieldValue(
             name=field_name,
             field_type=field_type,
             value=field_value,
             required=required
         )
-        legal_field.values.append(legal_field_value)
+        self.legal_fields.append(legal_field)
         return legal_field
 
     def add_contact(self, contact_type, value, metadata=None):
@@ -98,8 +94,8 @@ class Translation(Base):
     field_name: Mapped[str] = Column(String(255), nullable=False)
     language_code: Mapped[str] = Column(String(2), nullable=False)
     value: Mapped[str] = Column(Text, nullable=False)
-    created_at: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_time: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_time: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     __table_args__ = (
         UniqueConstraint('entity_id', 'entity_type', 'field_name', 'language_code', name='uq_translation'),
@@ -157,32 +153,14 @@ class LegalField(Base):
     __tablename__ = 'legal_fields'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
-    country_code = Column(String(2), nullable=False)
-    version = Column(Integer, nullable=False)
-    effective_from = Column(DateTime(timezone=True), nullable=False)
-    effective_to = Column(DateTime(timezone=True))
-    modified_by = Column(Integer, ForeignKey('users.id'), nullable=False)
-    approved_by = Column(Integer, ForeignKey('users.id'))
-    previous_version = Column(UUID(as_uuid=True), ForeignKey('legal_fields.id'))
-    change_reason = Column(Text)
-    status = Column(Enum(FiledStatus, name='field_status'), nullable=False)
-    is_translatable = Column(Boolean, nullable=False, default=False)
-
-    company = relationship("Company", back_populates="legal_fields")
-    values = relationship("LegalFieldValue", back_populates="legal_field", cascade="all, delete-orphan")
-    previous = relationship("LegalField", remote_side=[id], backref="next_versions")
-
-
-class LegalFieldValue(Base):
-    __tablename__ = 'legal_field_values'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    legal_fields_id = Column(UUID(as_uuid=True), ForeignKey('legal_fields.id'), nullable=False)
     name = Column(String(255), nullable=False)
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
     value = Column(JSONB, nullable=False)
-    required = Column(Boolean, nullable=False, default=False)
 
-    legal_field = relationship("LegalField", back_populates="values")
+    required = Column(Boolean, nullable=False, default=False)
+    is_translatable = Column(Boolean, nullable=False, default=False)
+
+    legal_field = relationship("Company", back_populates="legal_fields")
 
 
 class SystemField(Base):

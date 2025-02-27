@@ -6,7 +6,7 @@ from sqlalchemy import or_
 
 from src.company.enums import FiledStatus, ValidationType
 from src.company.models import CountryLegalRequirement, ValidationRule
-from src.company.enums import FieldType, CompanyStatus, EntityType
+from src.company.enums import FieldType, LegalStatus, EntityType
 from src.company.models import Company, Translation
 from src.company.repository import CountryLegalRequirementRepository
 
@@ -107,7 +107,7 @@ class CompanyRepository:
     def get_company_by_id(self, company_id: UUID):
         return self.session.query(Company).filter_by(id=company_id).first()
 
-    def update_company_status(self, company_id: UUID, new_status: CompanyStatus):
+    def update_company_status(self, company_id: UUID, new_status: LegalStatus):
         company = self.get_company_by_id(company_id)
         if company:
             company.status = new_status
