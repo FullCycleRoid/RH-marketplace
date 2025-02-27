@@ -124,7 +124,6 @@ class CountryLegalRequirement(Base):
     )
 
 
-# Требуемые поля для стран
 class RequiredField(Base):
     __tablename__ = 'required_fields'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)

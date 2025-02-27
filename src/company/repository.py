@@ -1,12 +1,14 @@
 import re
 from datetime import datetime
 from uuid import UUID
-
-from requests import Session
+from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from src.company.enums import FiledStatus, ValidationType, FieldType, CompanyStatus, EntityType
-from src.company.models import Company, CountryLegalRequirement, ValidationRule, Translation
+from src.company.enums import FiledStatus, ValidationType
+from src.company.models import CountryLegalRequirement, ValidationRule
+from src.company.enums import FieldType, CompanyStatus, EntityType
+from src.company.models import Company, Translation
+from src.company.repository import CountryLegalRequirementRepository
 
 
 class CountryLegalRequirementRepository:
@@ -68,7 +70,6 @@ class CountryLegalRequirementRepository:
             pattern = rule.params.get("pattern")
             if not re.match(pattern, str(value)):
                 raise ValueError(f"Value '{value}' does not match the regex pattern: {pattern}.")
-        # Добавьте другие типы валидации по необходимости
 
 
 class CompanyRepository:
@@ -117,6 +118,7 @@ class CompanyRepository:
 
     def add_legal_field_to_company(self, company_id: UUID, field_name: str, field_value: any,
                                    field_type: FieldType = FieldType.STRING, required: bool = False):
+
         company = self.get_company_by_id(company_id)
         if company:
             legal_field = company.add_legal_field(field_name, field_value, field_type, required)
