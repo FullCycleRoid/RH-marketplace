@@ -2,7 +2,7 @@ from enum import Enum
 
 class CompanyStatus(str, Enum):
     ACTIVE = 'ACTIVE'
-    INACTIVE = 'INACTIVE'
+    LIQUIDATED = 'LIQUIDATED'
     SUSPENDED = 'SUSPENDED'
     ON_MODERATION = 'ON_MODERATION'
 
@@ -21,6 +21,7 @@ class ContactType(str, Enum):
 class EntityType(str, Enum):
     COMPANY = 'COMPANY'
     LEGAL_FIELDS = 'LEGAL_FIELDS'
+    SYSTEM_FIELDS = 'SYSTEM_FIELDS'
     CUSTOM_FIELD = 'CUSTOM_FIELD'
     CONTACT = 'CONTACT'
     FINANCIAL_REPORT = 'FINANCIAL_REPORT'
@@ -47,3 +48,13 @@ class ValidationType(str, Enum):
     LENGTH = 'LENGTH'
     RANGE = 'RANGE'
     CUSTOM = 'CUSTOM'
+
+class ManagerType(str, Enum):
+    DIRECTOR = "DIRECTOR"
+    FOUNDER = "FOUNDER"
+    SALES_MANAGER= "SALES MANAGER"
+    PURCHASE_MANAGER = "PURCHASE MANAGER"
+    LOGIST = "LOGIST"
+    ACCOUNTANT = "ACCOUNTANT"
+    MANAGER = "MANAGER"
+

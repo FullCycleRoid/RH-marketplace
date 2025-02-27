@@ -22,6 +22,7 @@ class Company(Base):
     updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
 
     legal_fields = relationship("LegalField", back_populates="company", cascade="all, delete-orphan")
+    system_fields = relationship("SystemField", back_populates="company", cascade="all, delete-orphan")
     custom_fields = relationship("CustomField", back_populates="company", cascade="all, delete-orphan")
     contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
     financial_reports = relationship("FinancialReport", back_populates="company", cascade="all, delete-orphan")
@@ -33,14 +34,14 @@ class Company(Base):
         Index('idx_company_status', status),
     )
 
-    def add_legal_field(self, field_name, field_value, field_type, required=False):
+    def add_legal_field(self, user_id, field_name, field_value, field_type, required=False):
         legal_field = LegalField(
             company_id=self.id,
             country_code=self.country_code,
             version=1,
             effective_from=datetime.utcnow(),
             status=FiledStatus.ACTIVE,
-            modified_by=1
+            modified_by=user_id
         )
 
         self.legal_fields.append(legal_field)
@@ -114,7 +115,6 @@ class CountryLegalRequirement(Base):
     active_to = Column(DateTime(timezone=True))
     status = Column(Enum(FiledStatus, name='field_status'), nullable=False)
 
-    # Отношения
     required_fields = relationship("RequiredField", back_populates="requirement", cascade="all, delete-orphan")
 
     __table_args__ = (
@@ -132,7 +132,6 @@ class RequiredField(Base):
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
     display_order = Column(Integer, nullable=False)
 
-    # Отношения
     requirement = relationship("CountryLegalRequirement", back_populates="required_fields")
     validation_rules = relationship("ValidationRule", back_populates="field", cascade="all, delete-orphan")
 
@@ -142,7 +141,6 @@ class RequiredField(Base):
     )
 
 
-# Правила валидации для требуемых полей
 class ValidationRule(Base):
     __tablename__ = 'validation_rules'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -155,7 +153,6 @@ class ValidationRule(Base):
     field = relationship("RequiredField", back_populates="validation_rules")
 
 
-# Юридические поля компаний
 class LegalField(Base):
     __tablename__ = 'legal_fields'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -171,13 +168,11 @@ class LegalField(Base):
     status = Column(Enum(FiledStatus, name='field_status'), nullable=False)
     is_translatable = Column(Boolean, nullable=False, default=False)
 
-    # Отношения
     company = relationship("Company", back_populates="legal_fields")
     values = relationship("LegalFieldValue", back_populates="legal_field", cascade="all, delete-orphan")
     previous = relationship("LegalField", remote_side=[id], backref="next_versions")
 
 
-# Значения юридических полей
 class LegalFieldValue(Base):
     __tablename__ = 'legal_field_values'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -187,11 +182,21 @@ class LegalFieldValue(Base):
     value = Column(JSONB, nullable=False)
     required = Column(Boolean, nullable=False, default=False)
 
-    # Отношения
     legal_field = relationship("LegalField", back_populates="values")
 
 
-# Пользовательские поля
+class SystemField(Base):
+    __tablename__ = 'system_fields'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
+    name = Column(String(255), nullable=False)
+    field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
+    value = Column(JSONB, nullable=False)
+    is_translatable = Column(Boolean, nullable=False, default=False)
+
+    company = relationship("Company", back_populates="system_fields")
+
+
 class CustomField(Base):
     __tablename__ = 'custom_fields'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -201,11 +206,9 @@ class CustomField(Base):
     value = Column(JSONB, nullable=False)
     is_translatable = Column(Boolean, nullable=False, default=False)
 
-    # Отношения
     company = relationship("Company", back_populates="custom_fields")
 
 
-# Контакты компаний
 class Contact(Base):
     __tablename__ = 'contacts'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -216,11 +219,9 @@ class Contact(Base):
     is_verified = Column(Boolean, nullable=False, default=False)
     verified_at = Column(DateTime(timezone=True))
 
-    # Отношения
     company = relationship("Company", back_populates="contacts")
 
 
-# Финансовые отчеты
 class FinancialReport(Base):
     __tablename__ = 'financial_reports'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -232,11 +233,9 @@ class FinancialReport(Base):
     status = Column(Enum(ReportStatus, name='report_status'), nullable=False)
     audited_by = Column(Integer, ForeignKey('users.id'))
 
-    # Отношения
     company = relationship("Company", back_populates="financial_reports")
 
 
-# Налоговые отчеты
 class TaxReport(Base):
     __tablename__ = 'tax_reports'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -247,11 +246,9 @@ class TaxReport(Base):
     period_end = Column(DateTime(timezone=True), nullable=False)
     status = Column(Enum(ReportStatus, name='report_status'), nullable=False)
 
-    # Отношения
     company = relationship("Company", back_populates="tax_reports")
 
 
-# Аудит изменений
 class CompanyChangeLog(Base):
     __tablename__ = 'company_change_log'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -263,5 +260,4 @@ class CompanyChangeLog(Base):
     reason = Column(Text)
     changes = Column(JSONB, nullable=False)
 
-    # Отношения
     company = relationship("Company", back_populates="change_logs")
