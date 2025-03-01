@@ -30,6 +30,7 @@ class User(Base):
     last_login = Column(DateTime(timezone=True))
 
     role = relationship("UserRole", back_populates="user")
+    messages = relationship("Message", back_populates="messages")
 
     def __repr__(self):
         return f"<User(id={self.id}, email='{self.email}', provider='{self.provider}')>"
