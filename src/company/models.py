@@ -6,8 +6,7 @@ from sqlalchemy.orm import relationship, Mapped
 from uuid import uuid4
 
 from src import Base
-from src.company.enums import LegalStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, \
-    ReportStatus, SystemStatus
+from src.company.enums import LegalStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, ReportStatus, SystemStatus
 
 
 class Company(Base):
@@ -27,13 +26,13 @@ class Company(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
 
-    legal_fields = relationship("LegalField", back_populates="company", cascade="all, delete-orphan")
-    system_fields = relationship("SystemField", back_populates="company", cascade="all, delete-orphan")
-    custom_fields = relationship("CustomField", back_populates="company", cascade="all, delete-orphan")
-    contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
-    financial_reports = relationship("FinancialReport", back_populates="company", cascade="all, delete-orphan")
-    tax_reports = relationship("TaxReport", back_populates="company", cascade="all, delete-orphan")
-    change_logs = relationship("CompanyChangeLog", back_populates="company", cascade="all, delete-orphan")
+    legal_fields = relationship("LegalField", back_populates="company_loader", cascade="all, delete-orphan")
+    system_fields = relationship("SystemField", back_populates="company_loader", cascade="all, delete-orphan")
+    custom_fields = relationship("CustomField", back_populates="company_loader", cascade="all, delete-orphan")
+    contacts = relationship("Contact", back_populates="company_loader", cascade="all, delete-orphan")
+    financial_reports = relationship("FinancialReport", back_populates="company_loader", cascade="all, delete-orphan")
+    tax_reports = relationship("TaxReport", back_populates="company_loader", cascade="all, delete-orphan")
+    change_logs = relationship("CompanyChangeLog", back_populates="company_loader", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_company_country_code', country_code),
@@ -50,12 +49,11 @@ class Company(Base):
         self.legal_fields.append(legal_field)
         return legal_field
 
-    def add_contact(self, contact_type, value, metadata=None):
+    def add_contact(self, contact_type, value):
         contact = Contact(
             company_id=self.id,
             type=contact_type,
-            value=value,
-            metadata=metadata
+            value=value
         )
         self.contacts.append(contact)
         return contact
@@ -193,7 +191,6 @@ class Contact(Base):
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
     type = Column(Enum(ContactType, name='contact_type'), nullable=False)
     value = Column(Text, nullable=False)
-    metadata = Column(JSONB)
     is_verified = Column(Boolean, nullable=False, default=False)
     verified_at = Column(DateTime(timezone=True))
 

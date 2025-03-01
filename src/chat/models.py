@@ -1,3 +1,5 @@
+from sqlalchemy import (Column, Integer, ForeignKey, DateTime, Text, func)
+from sqlalchemy.orm import relationship
 
 from src.core.database.declarative_base import Base
 
@@ -17,7 +19,7 @@ class Message(Base):
     __tablename__ = "messages"
     id = Column(Integer, primary_key=True, index=True)
     content = Column(Text)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=func.now)
     manager_id = Column(Integer, ForeignKey("managers.id"))
     dialogue_id = Column(Integer, ForeignKey("dialogues.id"))
 

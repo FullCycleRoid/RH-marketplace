@@ -29,7 +29,7 @@ def create_dialogue(dialogue: schemas.DialogueCreate, db: Session = Depends(get_
     return db_dialogue
 
 
-@router.get("/dialogues/company/{company_id}", response_model=List[schemas.DialogueResponse])
+@router.get("/dialogues/company_loader/{company_id}", response_model=List[schemas.DialogueResponse])
 def get_dialogues_by_company(company_id: int, db: Session = Depends(get_db)):
     dialogues = (
         db.query(models.Dialogue)
