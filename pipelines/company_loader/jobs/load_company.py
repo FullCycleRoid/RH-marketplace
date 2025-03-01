@@ -1,6 +1,6 @@
-import asyncio
-
-from loader_pipelines.generic_pipeline import Pipeline, Context, error_handler
+from pipelines.company_loader.contexts import CompanyContext
+from pipelines.company_loader.steps.load_company_step import LoadRawCompanyStep
+from pipelines.generic_pipeline import Context, Pipeline, error_handler
 
 
 async def ru_company_loader():
@@ -28,21 +28,15 @@ async def ru_company_loader():
     pass
 
 def start_process():
-    row_company_data_ctx = LegacyContext()
-    load_legacy = Pipeline[Context](
-        LoadLegacyStep()
-    )
-    load_legacy(legacy_ctx, error_handler)
+    company_ctx = CompanyContext()
 
-    for user in legacy_ctx.users:
-        row_ctx = RowContext(legacy=legacy_ctx, legacy_record=user)
-        process_item = Pipeline[Context](
-            # CheckUserExistStep(),
-            # CreateNewUserStep(),
-            # SetCorrectUserPhoneStep()
+    while company_ctx.current_id < 10000:
+        load_legacy = Pipeline[Context](
+            LoadRawCompanyStep()
         )
-        process_item(row_ctx, error_handler)
-        print(f'Finish with failed: {row_ctx.failed_records}')
+        load_legacy(company_ctx, error_handler)
+
+        company_ctx.current_id += 1
 
 
 if __name__ == '__main__':
