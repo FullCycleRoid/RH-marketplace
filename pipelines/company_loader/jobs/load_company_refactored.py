@@ -9,6 +9,7 @@ from pipelines.company_loader.steps.handle_average_number_of_employees import Co
 from pipelines.company_loader.steps.handle_contacts_step import HandleContactsStep
 from pipelines.company_loader.steps.add_director_step import AddDirectorStep
 from pipelines.company_loader.steps.handle_financial_reports_step import HandleFinancialReportStep
+from pipelines.company_loader.steps.handle_tax_reports_step import HandleTaxReportStep
 from pipelines.company_loader.steps.match_legal_status_step import MatchLegalStateStep
 from pipelines.company_loader.utils import get_active_companies
 from pipelines.generic_pipeline import Pipeline, Context, error_handler
@@ -65,7 +66,8 @@ def benchmark_processing():
         ConvertAverageNumberOfEmployeesStep(),
         HandleContactsStep(),
         AddDirectorStep(),
-        HandleFinancialReportStep()
+        HandleFinancialReportStep(),
+        HandleTaxReportStep()
     )
 
     # Тестируем последовательную обработку

@@ -47,10 +47,8 @@ class FinancialReport:
 @dataclass
 class TaxReport:
     year: datetime
-    quarter: str
-    period_start: datetime
-    period_end: datetime
-    status: ReportStatus
+    taxes_paid: int
+    paid_insurance: int
 
 
 @dataclass

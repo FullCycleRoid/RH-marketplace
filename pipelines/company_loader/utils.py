@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 from sqlalchemy import or_, func
@@ -78,3 +79,25 @@ def convert_ru_date_to_date_obj(raw_date: str) -> Optional[datetime]:
 
     except ValueError as err:
         logger.info(f"Registration date convert error: {err}")
+
+
+def convert_to_numeric(value):
+    try:
+        # Извлекаем числовую часть и единицы измерения
+        match = re.search(r"(-?\d[\d\.,]*)\s*(тыс|млн|млрд|трлн)?\.?\s*руб", value)
+        if not match:
+            return 0
+
+        number = float(match.group(1).replace(",", ".").replace(" ", ""))
+        unit = match.group(2)
+
+        multipliers = {
+            "тыс": 1_000,
+            "млн": 1_000_000,
+            "млрд": 1_000_000_000,
+            "трлн": 1_000_000_000_000
+        }
+
+        return int(number * multipliers.get(unit, 1))
+    except:
+        return 0

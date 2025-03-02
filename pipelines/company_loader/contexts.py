@@ -47,9 +47,8 @@ class CompanyDTO:
 
 @dataclass
 class CompanyContext:
-    failed_records: int = 0
-    current_id: Optional[int] = 1
-
     raw_company: Optional[RawCompany] = None
     company_dto: Optional[CompanyDTO] = None
     company_model: Optional[Company] = None
+
+    failed_records = 0
