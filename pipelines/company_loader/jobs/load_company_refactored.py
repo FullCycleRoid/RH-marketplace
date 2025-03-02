@@ -3,12 +3,17 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
 from pipelines.company_loader.contexts import CompanyContext
 from pipelines.company_loader.steps.convert_registration_date import ConvertRegistrationDateStep
-from pipelines.company_loader.steps.create_company_dto_step import CreateCompanyDTOStep
-from pipelines.company_loader.steps.match_legal_form_step import MatchLegalStateStep
+from pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep
+from pipelines.company_loader.steps.handle_authorized_capital import ConvertAuthorizedCapitalStep
+from pipelines.company_loader.steps.handle_average_number_of_employees import ConvertAverageNumberOfEmployeesStep
+from pipelines.company_loader.steps.handle_contacts_step import HandleContactsStep
+from pipelines.company_loader.steps.add_director_step import AddDirectorStep
+from pipelines.company_loader.steps.handle_financial_reports_step import HandleFinancialReportStep
+from pipelines.company_loader.steps.match_legal_status_step import MatchLegalStateStep
 from pipelines.company_loader.utils import get_active_companies
 from pipelines.generic_pipeline import Pipeline, Context, error_handler
 
-BATCH_SIZE = 100
+BATCH_SIZE = 300
 
 def process_single_company(company, process_pipeline, error_handler):
     """Обработка одной компании"""
@@ -55,7 +60,12 @@ def benchmark_processing():
     process_pipeline = Pipeline[Context](
         CreateCompanyDTOStep(),
         ConvertRegistrationDateStep(),
-        MatchLegalStateStep()
+        MatchLegalStateStep(),
+        ConvertAuthorizedCapitalStep(),
+        ConvertAverageNumberOfEmployeesStep(),
+        HandleContactsStep(),
+        AddDirectorStep(),
+        HandleFinancialReportStep()
     )
 
     # Тестируем последовательную обработку

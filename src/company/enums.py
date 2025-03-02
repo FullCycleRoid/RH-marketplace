@@ -4,6 +4,8 @@ from enum import Enum
 class LegalStatus(str, Enum):
     ACTIVE = 'ACTIVE'
     LIQUIDATED = 'LIQUIDATED'
+    BANKRUPTCY = 'BANKRUPTCY'
+    EXCLUDED_FROM_REGISTER = 'EXCLUDED_FROM_REGISTER'
     SUSPENDED = 'SUSPENDED'
     UNKNOWN = 'UNKNOWN'
     ON_MODERATION = 'ON_MODERATION'
@@ -63,6 +65,7 @@ class ValidationType(str, Enum):
 
 class ManagerType(str, Enum):
     DIRECTOR = 'DIRECTOR'
+    CEO = 'CEO'
     FOUNDER = 'FOUNDER'
     SALES_MANAGER= 'SALES MANAGER'
     PURCHASE_MANAGER = 'PURCHASE MANAGER'

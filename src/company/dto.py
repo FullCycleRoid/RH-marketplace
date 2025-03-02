@@ -11,7 +11,6 @@ class Contact:
     type: ContactType
     value: str
     is_verified: bool
-    verified_at: bool
 
 
 @dataclass
@@ -33,8 +32,8 @@ class Manager:
     name: str
     patronymic: str
     surname: str
-    inn: Optional[str]
     since_on_position: Optional[datetime]
+    inn: Optional[str] = None
 
 
 @dataclass

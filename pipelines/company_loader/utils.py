@@ -9,15 +9,20 @@ from datetime import datetime
 from src.core.logger import logger
 
 
+# def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
+#     with _session() as session:
+#         res = session.query(RawCompany).filter(
+#             or_(
+#                 RawCompany.legal_entity_state == "Действующая компания",
+#                 RawCompany.legal_entity_state == "Действующая организация",
+#                 RawCompany.legal_entity_state.startswith("Юридическое лицо ликвидировано")
+#             )
+#         ).limit(BATCH_SIZE).offset(offset).all()
+#         return res
+
 def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
     with _session() as session:
-        res = session.query(RawCompany).filter(
-            or_(
-                RawCompany.legal_entity_state == "Действующая компания",
-                RawCompany.legal_entity_state == "Действующая организация",
-                RawCompany.legal_entity_state.startswith("Юридическое лицо ликвидировано")
-            )
-        ).limit(BATCH_SIZE).offset(offset).all()
+        res = session.query(RawCompany).filter(RawCompany.legal_name != "Индивидуальный предприниматель").limit(BATCH_SIZE).offset(offset).all()
         return res
 
 

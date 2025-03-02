@@ -39,7 +39,7 @@ class Company(Base):
         Index('idx_legal_status', legal_status),
     )
 
-    def add_legal_field(self, user_id, field_name, field_value, field_type, required=False):
+    def add_legal_field(self, field_name, field_value, field_type, required=False):
         legal_field = LegalField(
             name=field_name,
             field_type=field_type,
@@ -192,7 +192,6 @@ class Contact(Base):
     type = Column(Enum(ContactType, name='contact_type'), nullable=False)
     value = Column(Text, nullable=False)
     is_verified = Column(Boolean, nullable=False, default=False)
-    verified_at = Column(DateTime(timezone=True))
 
     company = relationship("Company", back_populates="contacts")
 

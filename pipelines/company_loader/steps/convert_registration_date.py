@@ -9,7 +9,7 @@ class ConvertRegistrationDateStep:
 
         if not registration_date:
             logger.info("Registration date is None")
-            next_step(context)
+        else:
+            context.company_dto.registration_date = convert_ru_date_to_date_obj(registration_date)
 
-        context.company_dto.registration_date = convert_ru_date_to_date_obj(registration_date)
         next_step(context)
