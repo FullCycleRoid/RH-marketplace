@@ -1,0 +1,75 @@
+from typing import Optional
+
+from sqlalchemy import or_, func
+from sqlalchemy.orm import Session
+
+from pipelines.company_loader.connector import SessionFactory
+from pipelines.company_loader.raw_model import RawCompany
+from datetime import datetime
+from src.core.logger import logger
+
+
+def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
+    with _session() as session:
+        res = session.query(RawCompany).filter(
+            or_(
+                RawCompany.legal_entity_state == "Действующая компания",
+                RawCompany.legal_entity_state == "Действующая организация",
+                RawCompany.legal_entity_state.startswith("Юридическое лицо ликвидировано")
+            )
+        ).limit(BATCH_SIZE).offset(offset).all()
+        return res
+
+
+def get_active_company_count(_session: Session = SessionFactory):
+    with _session() as session:
+        count = session.query(func.count()).filter(
+            or_(
+                RawCompany.legal_entity_state == "Действующая компания",
+                RawCompany.legal_entity_state == "Действующая организация",
+                RawCompany.legal_entity_state.startswith("Юридическое лицо ликвидировано")
+            )
+        ).scalar()
+        return count
+
+
+def get_entrepreneurs(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
+    with _session() as session:
+        res = session.query(RawCompany).filter(RawCompany.legal_entity_state == "Действующее ИП").limit(BATCH_SIZE).offset(offset).all()
+        return res
+
+
+MONTHS = {
+    'января': 'January',
+    'февраля': 'February',
+    'марта': 'March',
+    'апреля': 'April',
+    'мая': 'May',
+    'июня': 'June',
+    'июля': 'July',
+    'августа': 'August',
+    'сентября': 'September',
+    'октября': 'October',
+    'ноября': 'November',
+    'декабря': 'December'
+}
+
+
+def convert_ru_date_to_date_obj(raw_date: str) -> Optional[datetime]:
+    month_replaced = False
+    for ru_month, en_month in MONTHS.items():
+        if ru_month in raw_date:
+            date_str = raw_date.replace(ru_month, en_month)
+            month_replaced = True
+            break
+
+    if not month_replaced:
+        logger.info(f"Month not found in registration date: {raw_date}")
+        return
+
+    try:
+        date_obj = datetime.strptime(date_str, "%d %B %Y года")
+        return date_obj.date()
+
+    except ValueError as err:
+        logger.info(f"Registration date convert error: {err}")

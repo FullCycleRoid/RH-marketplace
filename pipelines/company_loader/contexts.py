@@ -11,7 +11,8 @@ from src.company.enums import LegalStatus, SystemStatus
 class CompanyDTO:
     name: str
     inn: str
-    registration_date: datetime
+    registration_date: Optional[datetime] = None
+    liquidation_date: Optional[datetime] = None
 
     country_code: str = 'RU'
     legal_status: LegalStatus = LegalStatus.UNKNOWN
@@ -49,3 +50,4 @@ class CompanyContext:
 
     raw_company: Optional[RawCompany] = None
     company_dto: Optional[CompanyDTO] = None
+    company_model: Optional[CompanyDTO] = None
