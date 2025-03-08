@@ -35,6 +35,8 @@ class CompanyDTO:
     oktmo_code: Optional[str] = None
     code_kladr: Optional[str] = None
 
+    reliability_assessment: List[str] = field(default_factory=list)
+
     contacts: List[Contact] = field(default_factory=list)
     addresses: List[Address] = field(default_factory=list)
     management: List[Manager] = field(default_factory=list)

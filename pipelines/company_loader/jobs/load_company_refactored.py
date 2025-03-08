@@ -2,6 +2,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
 from pipelines.company_loader.contexts import CompanyContext
+from pipelines.company_loader.steps.handle_reliability_assessment_step import HandleReliabilityAssessmentStep
 from pipelines.company_loader.steps.convert_registration_date import ConvertRegistrationDateStep
 from pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep
 from pipelines.company_loader.steps.handle_authorized_capital import ConvertAuthorizedCapitalStep
@@ -14,7 +15,8 @@ from pipelines.company_loader.steps.match_legal_status_step import MatchLegalSta
 from pipelines.company_loader.utils import get_active_companies
 from pipelines.generic_pipeline import Pipeline, Context, error_handler
 
-BATCH_SIZE = 300
+BATCH_SIZE = 30
+
 
 def process_single_company(company, process_pipeline, error_handler):
     """Обработка одной компании"""
@@ -67,7 +69,9 @@ def benchmark_processing():
         HandleContactsStep(),
         AddDirectorStep(),
         HandleFinancialReportStep(),
-        HandleTaxReportStep()
+        HandleTaxReportStep(),
+        # RewriteReliabilityAssessmentStep(),
+        HandleReliabilityAssessmentStep()
     )
 
     # Тестируем последовательную обработку
