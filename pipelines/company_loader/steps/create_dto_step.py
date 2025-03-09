@@ -1,4 +1,4 @@
-from pipelines.company_loader.contexts import CompanyDTO
+from pipelines.company_loader.context import CompanyDTO
 from pipelines.generic_pipeline import Context, NextStep
 from src.company.enums import SystemStatus
 
@@ -15,6 +15,8 @@ class CreateCompanyDTOStep:
             ogrn=context.raw_company.ogrn,
             kpp=context.raw_company.kpp,
             okpo=context.raw_company.okpo,
+
+            okveds=context.raw_company.okved,
 
             okogu_code=context.raw_company.okogu_code,
             okopf_code=context.raw_company.okopf_code,

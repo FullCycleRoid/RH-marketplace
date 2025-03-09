@@ -1,4 +1,3 @@
-from ml_models.paraphraser import paraphrase
 from pipelines.generic_pipeline import Context, NextStep
 
 
@@ -10,7 +9,5 @@ class HandleReliabilityAssessmentStep:
             rewrite_assessment.append(assessment)
 
         context.company_dto.reliability_assessment = rewrite_assessment
-
-        print(context.company_dto.reliability_assessment, 'context.company_dto.reliability_assessment')
 
         next_step(context)

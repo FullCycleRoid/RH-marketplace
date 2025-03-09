@@ -1,30 +1,39 @@
 import re
 from typing import Optional
 
+from sqlalchemy.orm import Session
+from sqlalchemy import func
 from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 
-from pipelines.company_loader.connector import SessionFactory
-from pipelines.company_loader.raw_model import RawCompany
+from pipelines.connector import SessionFactory
+from pipelines.raw_model import RawCompany
 from datetime import datetime
 from src.core.logger import logger
 
-
-# def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
-#     with _session() as session:
-#         res = session.query(RawCompany).filter(
-#             or_(
-#                 RawCompany.legal_entity_state == "Действующая компания",
-#                 RawCompany.legal_entity_state == "Действующая организация",
-#                 RawCompany.legal_entity_state.startswith("Юридическое лицо ликвидировано")
-#             )
-#         ).limit(BATCH_SIZE).offset(offset).all()
-#         return res
 
 def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
     with _session() as session:
         res = session.query(RawCompany).filter(RawCompany.legal_name != "Индивидуальный предприниматель").limit(BATCH_SIZE).offset(offset).all()
         return res
+
+
+def get_company_okved(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
+    with _session() as session:
+        res = session.query(RawCompany.okved).limit(BATCH_SIZE).offset(offset).all()
+        return res
+
+
+def get_random_company_okved(BATCH_SIZE: int = 10000, _session: Session = SessionFactory):
+    with _session() as session:
+        # Случайным образом упорядочиваем записи и выбираем BATCH_SIZE записей
+        res = session.query(RawCompany.okved).order_by(func.random()).limit(BATCH_SIZE).all()
+        return res
+
+
+def get_total_count(_session: Session = SessionFactory):
+    with _session() as session:
+        return session.query(func.count(RawCompany.id)).scalar()
 
 
 def get_active_company_count(_session: Session = SessionFactory):

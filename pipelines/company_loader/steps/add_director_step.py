@@ -1,4 +1,4 @@
-from pipelines.company_loader.utils import convert_ru_date_to_date_obj
+from pipelines.utils import convert_ru_date_to_date_obj
 from pipelines.generic_pipeline import Context, NextStep
 from src.company.dto import Manager
 from src.company.enums import ManagerType
@@ -8,7 +8,6 @@ class AddDirectorStep:
     def __call__(self, context: Context, next_step: NextStep) -> None:
         director_name = context.raw_company.director_name
         if director_name:
-            print(director_name)
             split_name = director_name.split(' ')
             if len(split_name) == 3:
                 surname, name, patronymic = split_name

@@ -1,4 +1,4 @@
-from pipelines.company_loader.utils import convert_to_numeric
+from pipelines.utils import convert_to_numeric
 from pipelines.generic_pipeline import Context, NextStep
 from src.company.dto import TaxReport
 
@@ -23,5 +23,4 @@ class HandleTaxReportStep:
                 paid_insurance=paid_insurance
             )
         )
-        print(context.company_dto.tax_reports)
         next_step(context)

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional
 
-from pipelines.company_loader.raw_model import RawCompany
+from pipelines.raw_model import RawCompany
 from src.company.dto import Contact, Address, Manager, FinancialReport, TaxReport, Translations
 from src.company.enums import LegalStatus, SystemStatus
 from src.company.models import Company
@@ -27,6 +27,10 @@ class CompanyDTO:
     legal_form: Optional[str] = None
     authorized_capital: Optional[int] = None
     average_number_of_employees: Optional[int] = None
+
+    advantages: Optional[dict] = None
+
+    okveds: Optional[dict] = None
 
     okogu_code: Optional[str] = None
     okopf_code: Optional[str] = None
