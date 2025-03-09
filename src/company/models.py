@@ -26,13 +26,13 @@ class Company(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
 
-    legal_fields = relationship("LegalField", back_populates="company_loader", cascade="all, delete-orphan")
-    system_fields = relationship("SystemField", back_populates="company_loader", cascade="all, delete-orphan")
-    custom_fields = relationship("CustomField", back_populates="company_loader", cascade="all, delete-orphan")
-    contacts = relationship("Contact", back_populates="company_loader", cascade="all, delete-orphan")
-    financial_reports = relationship("FinancialReport", back_populates="company_loader", cascade="all, delete-orphan")
-    tax_reports = relationship("TaxReport", back_populates="company_loader", cascade="all, delete-orphan")
-    change_logs = relationship("CompanyChangeLog", back_populates="company_loader", cascade="all, delete-orphan")
+    legal_fields = relationship("LegalField", back_populates="company", cascade="all, delete-orphan")
+    system_fields = relationship("SystemField", back_populates="company", cascade="all, delete-orphan")
+    custom_fields = relationship("CustomField", back_populates="company", cascade="all, delete-orphan")
+    contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
+    financial_reports = relationship("FinancialReport", back_populates="company", cascade="all, delete-orphan")
+    tax_reports = relationship("TaxReport", back_populates="company", cascade="all, delete-orphan")
+    change_logs = relationship("CompanyChangeLog", back_populates="company", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_company_country_code', country_code),
@@ -158,7 +158,7 @@ class LegalField(Base):
     required = Column(Boolean, nullable=False, default=False)
     is_translatable = Column(Boolean, nullable=False, default=False)
 
-    legal_field = relationship("Company", back_populates="legal_fields")
+    company = relationship("Company", back_populates="legal_fields")
 
 
 class SystemField(Base):

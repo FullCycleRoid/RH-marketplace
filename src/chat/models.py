@@ -25,5 +25,5 @@ class Message(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     dialogue_id = Column(UUID, ForeignKey("dialogues.id"))
 
-    user = relationship("User", back_populates="messages")
+    # user = relationship("User", back_populates="messages")
     dialogue = relationship("Dialogue", back_populates="messages")

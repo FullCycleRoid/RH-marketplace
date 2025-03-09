@@ -1,8 +1,6 @@
 import re
 from typing import Optional
 
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 
