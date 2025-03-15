@@ -6,59 +6,59 @@ from sqlalchemy.orm import relationship, Mapped
 from uuid import uuid4
 
 from src import Base
-from src.company.enums import CompanyStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, ReportStatus
+from src.company.enums import LegalStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, ReportStatus, SystemStatus, \
+    TranslationType, ManagerType
 
 
 class Company(Base):
     __tablename__ = 'companies'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     country_code = Column(String(2), nullable=False)
-    status = Column(
-        Enum(CompanyStatus, name='company_status'),
+    legal_status = Column(
+        Enum(LegalStatus, name='legal_status'),
         nullable=False,
-        default=CompanyStatus.ON_MODERATION
+        default=LegalStatus.UNKNOWN
+    )
+    system_status = Column(
+        Enum(SystemStatus, name='system_status'),
+        nullable=False,
+        default=LegalStatus.ON_MODERATION
     )
     created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
 
     legal_fields = relationship("LegalField", back_populates="company", cascade="all, delete-orphan")
+    system_fields = relationship("SystemField", back_populates="company", cascade="all, delete-orphan")
     custom_fields = relationship("CustomField", back_populates="company", cascade="all, delete-orphan")
+
     contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
+    managers = relationship("Managers", back_populates="company", cascade="all, delete-orphan")
+
     financial_reports = relationship("FinancialReport", back_populates="company", cascade="all, delete-orphan")
     tax_reports = relationship("TaxReport", back_populates="company", cascade="all, delete-orphan")
+
     change_logs = relationship("CompanyChangeLog", back_populates="company", cascade="all, delete-orphan")
 
     __table_args__ = (
         Index('idx_company_country_code', country_code),
-        Index('idx_company_status', status),
+        Index('idx_legal_status', legal_status),
     )
 
     def add_legal_field(self, field_name, field_value, field_type, required=False):
         legal_field = LegalField(
-            company_id=self.id,
-            country_code=self.country_code,
-            version=1,
-            effective_from=datetime.utcnow(),
-            status=FiledStatus.ACTIVE,
-            modified_by=1
-        )
-
-        self.legal_fields.append(legal_field)
-        legal_field_value = LegalFieldValue(
             name=field_name,
             field_type=field_type,
             value=field_value,
             required=required
         )
-        legal_field.values.append(legal_field_value)
+        self.legal_fields.append(legal_field)
         return legal_field
 
-    def add_contact(self, contact_type, value, metadata=None):
+    def add_contact(self, contact_type, value):
         contact = Contact(
             company_id=self.id,
             type=contact_type,
-            value=value,
-            metadata=metadata
+            value=value
         )
         self.contacts.append(contact)
         return contact
@@ -88,23 +88,6 @@ class Company(Base):
         return report
 
 
-class Translation(Base):
-    __tablename__ = 'translations'
-
-    id: Mapped[UUID] = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    entity_id: Mapped[UUID] = Column(UUID(as_uuid=True), nullable=False)
-    entity_type: Mapped[EntityType] = Column(Enum(EntityType), nullable=False)
-    field_name: Mapped[str] = Column(String(255), nullable=False)
-    language_code: Mapped[str] = Column(String(2), nullable=False)
-    value: Mapped[str] = Column(Text, nullable=False)
-    created_at: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-
-    __table_args__ = (
-        UniqueConstraint('entity_id', 'entity_type', 'field_name', 'language_code', name='uq_translation'),
-    )
-
-
 class CountryLegalRequirement(Base):
     __tablename__ = 'country_legal_requirements'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -114,7 +97,6 @@ class CountryLegalRequirement(Base):
     active_to = Column(DateTime(timezone=True))
     status = Column(Enum(FiledStatus, name='field_status'), nullable=False)
 
-    # Отношения
     required_fields = relationship("RequiredField", back_populates="requirement", cascade="all, delete-orphan")
 
     __table_args__ = (
@@ -129,10 +111,10 @@ class RequiredField(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     requirement_id = Column(UUID(as_uuid=True), ForeignKey('country_legal_requirements.id'), nullable=False)
     name = Column(String(255), nullable=False)
+
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
     display_order = Column(Integer, nullable=False)
 
-    # Отношения
     requirement = relationship("CountryLegalRequirement", back_populates="required_fields")
     validation_rules = relationship("ValidationRule", back_populates="field", cascade="all, delete-orphan")
 
@@ -142,7 +124,6 @@ class RequiredField(Base):
     )
 
 
-# Правила валидации для требуемых полей
 class ValidationRule(Base):
     __tablename__ = 'validation_rules'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -155,72 +136,81 @@ class ValidationRule(Base):
     field = relationship("RequiredField", back_populates="validation_rules")
 
 
-# Юридические поля компаний
 class LegalField(Base):
     __tablename__ = 'legal_fields'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
-    country_code = Column(String(2), nullable=False)
-    version = Column(Integer, nullable=False)
-    effective_from = Column(DateTime(timezone=True), nullable=False)
-    effective_to = Column(DateTime(timezone=True))
-    modified_by = Column(Integer, ForeignKey('users.id'), nullable=False)
-    approved_by = Column(Integer, ForeignKey('users.id'))
-    previous_version = Column(UUID(as_uuid=True), ForeignKey('legal_fields.id'))
-    change_reason = Column(Text)
-    status = Column(Enum(FiledStatus, name='field_status'), nullable=False)
-    is_translatable = Column(Boolean, nullable=False, default=False)
-
-    # Отношения
-    company = relationship("Company", back_populates="legal_fields")
-    values = relationship("LegalFieldValue", back_populates="legal_field", cascade="all, delete-orphan")
-    previous = relationship("LegalField", remote_side=[id], backref="next_versions")
-
-
-# Значения юридических полей
-class LegalFieldValue(Base):
-    __tablename__ = 'legal_field_values'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    legal_fields_id = Column(UUID(as_uuid=True), ForeignKey('legal_fields.id'), nullable=False)
     name = Column(String(255), nullable=False)
+
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
-    value = Column(JSONB, nullable=False)
+    value = Column(JSONB, nullable=True)
+
     required = Column(Boolean, nullable=False, default=False)
+    is_translatable = Column(Boolean, nullable=False, default=False)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
 
-    # Отношения
-    legal_field = relationship("LegalField", back_populates="values")
+    company = relationship("Company", back_populates="legal_fields")
 
 
-# Пользовательские поля
+class SystemField(Base):
+    __tablename__ = 'system_fields'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
+    name = Column(String(255), nullable=False)
+
+    field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
+    value = Column(JSONB, nullable=True)
+
+    is_translatable = Column(Boolean, nullable=False, default=False)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
+
+    company = relationship("Company", back_populates="system_fields")
+
+
 class CustomField(Base):
     __tablename__ = 'custom_fields'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
     name = Column(String(255), nullable=False)
-    field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
-    value = Column(JSONB, nullable=False)
-    is_translatable = Column(Boolean, nullable=False, default=False)
 
-    # Отношения
+    field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
+    value = Column(JSONB, nullable=True)
+
+    is_translatable = Column(Boolean, nullable=False, default=False)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
+
     company = relationship("Company", back_populates="custom_fields")
 
 
-# Контакты компаний
+class Manager(Base):
+    __tablename__ = 'managers'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
+
+    position = Column(Enum(ManagerType, name='manager_type'), nullable=False)
+    inn = Column(Text, nullable=True)
+
+    full_name = Column(Text, nullable=True)
+    en_full_name = Column(Text, nullable=True)
+
+    since_on_position = Column(DateTime(timezone=True), nullable=True)
+
+    company = relationship("Company", back_populates="maangers")
+
+
 class Contact(Base):
     __tablename__ = 'contacts'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
     type = Column(Enum(ContactType, name='contact_type'), nullable=False)
     value = Column(Text, nullable=False)
-    metadata = Column(JSONB)
-    is_verified = Column(Boolean, nullable=False, default=False)
-    verified_at = Column(DateTime(timezone=True))
 
-    # Отношения
+    is_verified = Column(Boolean, nullable=False, default=False)
+
     company = relationship("Company", back_populates="contacts")
 
 
-# Финансовые отчеты
 class FinancialReport(Base):
     __tablename__ = 'financial_reports'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -232,11 +222,9 @@ class FinancialReport(Base):
     status = Column(Enum(ReportStatus, name='report_status'), nullable=False)
     audited_by = Column(Integer, ForeignKey('users.id'))
 
-    # Отношения
     company = relationship("Company", back_populates="financial_reports")
 
 
-# Налоговые отчеты
 class TaxReport(Base):
     __tablename__ = 'tax_reports'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -247,11 +235,9 @@ class TaxReport(Base):
     period_end = Column(DateTime(timezone=True), nullable=False)
     status = Column(Enum(ReportStatus, name='report_status'), nullable=False)
 
-    # Отношения
     company = relationship("Company", back_populates="tax_reports")
 
 
-# Аудит изменений
 class CompanyChangeLog(Base):
     __tablename__ = 'company_change_log'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -263,5 +249,4 @@ class CompanyChangeLog(Base):
     reason = Column(Text)
     changes = Column(JSONB, nullable=False)
 
-    # Отношения
     company = relationship("Company", back_populates="change_logs")
