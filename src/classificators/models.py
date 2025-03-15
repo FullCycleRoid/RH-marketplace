@@ -1,8 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
 
 
 from src import Base
@@ -33,7 +30,6 @@ class MKTUClassifier(Base):
     description = Column(Text)
     include = Column(Text)
     exclude = Column(Text)
-    products = Column(Text)
 
     # Переводы на английский
     type_en = Column(String)
@@ -42,18 +38,20 @@ class MKTUClassifier(Base):
     description_en = Column(Text)
     include_en = Column(Text)
     exclude_en = Column(Text)
-    products_en = Column(Text)
 
     # Связь с товарами
-    items = relationship("Product", back_populates="classifier")
+    categories = relationship("MKTUCategories", back_populates="classifier")
+
+    def __repr__(self):
+        return f"<MKTUClassifier(type={self.type}, name={self.name})>"
 
 
-class MKTUProduct(Base):
-    __tablename__ = 'products'
+class MKTUCategories(Base):
+    __tablename__ = 'MKTU_categories'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    classifier_id = Column(Integer, ForeignKey('classifiers.id'))
+    classifier_id = Column(Integer, ForeignKey('MKTU_classifier.id'))
 
     name_en = Column(String)
 
-    classifier = relationship("Classifier", back_populates="items")
+    classifier = relationship("MKTUClassifier", back_populates="categories")

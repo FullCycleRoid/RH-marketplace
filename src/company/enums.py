@@ -1,6 +1,11 @@
 from enum import Enum
 
 
+class TranslationType(str, Enum):
+    AUTO = 'AUTO'
+    USER = 'USER'
+
+
 class LegalStatus(str, Enum):
     ACTIVE = 'ACTIVE'
     LIQUIDATED = 'LIQUIDATED'

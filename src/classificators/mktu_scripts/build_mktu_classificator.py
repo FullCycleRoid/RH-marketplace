@@ -1,9 +1,14 @@
 import json
+from pprint import pprint
 
-from src import MKTUClassifier
+from sqlalchemy.orm import Session
+
+from src import MKTUClassifier, MKTUCategories
+from src.core.database.postgres.connectors import psycopg_sync_engine
+from src.core.language_translator.translator import translate_text, translate_large_text
 
 
-def load_data_from_json(file_path):
+def load_data_from_json(session, file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
@@ -15,34 +20,40 @@ def load_data_from_json(file_path):
                 description=item['description'],
                 include=item['include'],
                 exclude=item['exclude'],
-                products=item['products'],
 
-                # Пример переводов на английский (можно заменить на реальные переводы)
-                type_en=item['type'],
-                name_en=item['name'],
-                content_en=item['content'],
-                description_en=item['description'],
-                include_en=item['include'],
-                exclude_en=item['exclude'],
-                products_en=item['products']
+                type_en=translate_large_text(item['type'], 'ru', 'en'),
+                name_en=translate_large_text(item['name'], 'ru', 'en'),
+                content_en=translate_large_text(item['content'], 'ru', 'en'),
+                description_en=translate_large_text(item['description'], 'ru', 'en'),
+                include_en=translate_large_text(item['include'], 'ru', 'en'),
+                exclude_en=translate_large_text(item['exclude'], 'ru', 'en'),
             )
 
             session.add(classifier)
             session.commit()
 
+            print('Добавлен класс МКТУ')
+            pprint(classifier)
+
             # Загрузка товаров
-            products = item['products'].split('\n')
-            for product in products:
-                if product.strip():
-                    product_item = Product(
-                        name=product.strip(),
-                        name_en=product.strip(),  # Пример перевода на английский
+            categories = item['products'].split(';')
+            for category in categories:
+                if category.strip():
+                    product_item = MKTUCategories(
+                        name=category.strip(),
+                        name_en=translate_text(category.strip(), 'ru', 'en'),  # Пример перевода на английский
                         classifier_id=classifier.id
                     )
                     session.add(product_item)
-
+                    print(f'Добавлена категория: {category.strip()}')
             session.commit()
 
 
-# Загрузка данных из JSON-файла
-load_data_from_json('mktu.json')
+# ALTER SEQUENCE public."MKTU_categories_id_seq" RESTART WITH 1;
+# ALTER SEQUENCE public."MKTU_classifier_id_seq" RESTART WITH 1;
+
+
+if __name__ == "__main__":
+
+    with Session(psycopg_sync_engine) as session:
+        load_data_from_json(session, 'mktu.json')

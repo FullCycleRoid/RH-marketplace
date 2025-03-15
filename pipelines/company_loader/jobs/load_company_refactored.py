@@ -71,7 +71,6 @@ def benchmark_processing():
         AddDirectorStep(),
         HandleFinancialReportStep(),
         HandleTaxReportStep(),
-        # RewriteReliabilityAssessmentStep(),
         HandleReliabilityAssessmentStep(),
         HandleAdvantagesStep(),
     )

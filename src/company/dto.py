@@ -29,9 +29,9 @@ class Address:
 @dataclass
 class Manager:
     position: ManagerType
-    name: str
-    patronymic: str
-    surname: str
+    full_name: str
+    en_full_name: str
+
     since_on_position: Optional[datetime]
     inn: Optional[str] = None
 

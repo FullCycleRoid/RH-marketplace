@@ -1,21 +1,28 @@
 import json
+from pprint import pprint
 
 from sqlalchemy.orm import Session
 
 from src import OkvedNode
 from src.core.database.postgres.connectors import psycopg_sync_engine
+from src.core.language_translator.translator import translate_text
 
 
 def load_okved_data(session, data, parent=None):
     for item in data:
+        name = item["name"]
+        translation = translate_text(name, 'ru', 'en')
         node = OkvedNode(
             code=item['code'],
-            name=item['name'],
+            name=name,
+            en_name=translation,
             parent=parent
         )
         session.add(node)
         session.commit()
 
+        print("Добавлена категория")
+        pprint(node)
         if 'items' in item:
             load_okved_data(session, item['items'], node)
 

@@ -6,7 +6,8 @@ from sqlalchemy.orm import relationship, Mapped
 from uuid import uuid4
 
 from src import Base
-from src.company.enums import LegalStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, ReportStatus, SystemStatus
+from src.company.enums import LegalStatus, EntityType, FieldType, ValidationType, FiledStatus, ContactType, ReportStatus, SystemStatus, \
+    TranslationType, ManagerType
 
 
 class Company(Base):
@@ -29,9 +30,13 @@ class Company(Base):
     legal_fields = relationship("LegalField", back_populates="company", cascade="all, delete-orphan")
     system_fields = relationship("SystemField", back_populates="company", cascade="all, delete-orphan")
     custom_fields = relationship("CustomField", back_populates="company", cascade="all, delete-orphan")
+
     contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
+    managers = relationship("Managers", back_populates="company", cascade="all, delete-orphan")
+
     financial_reports = relationship("FinancialReport", back_populates="company", cascade="all, delete-orphan")
     tax_reports = relationship("TaxReport", back_populates="company", cascade="all, delete-orphan")
+
     change_logs = relationship("CompanyChangeLog", back_populates="company", cascade="all, delete-orphan")
 
     __table_args__ = (
@@ -83,23 +88,6 @@ class Company(Base):
         return report
 
 
-class Translation(Base):
-    __tablename__ = 'translations'
-
-    id: Mapped[UUID] = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    entity_id: Mapped[UUID] = Column(UUID(as_uuid=True), nullable=False)
-    entity_type: Mapped[EntityType] = Column(Enum(EntityType), nullable=False)
-    field_name: Mapped[str] = Column(String(255), nullable=False)
-    language_code: Mapped[str] = Column(String(2), nullable=False)
-    value: Mapped[str] = Column(Text, nullable=False)
-    created_time: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_time: Mapped[datetime] = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-
-    __table_args__ = (
-        UniqueConstraint('entity_id', 'entity_type', 'field_name', 'language_code', name='uq_translation'),
-    )
-
-
 class CountryLegalRequirement(Base):
     __tablename__ = 'country_legal_requirements'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
@@ -123,6 +111,7 @@ class RequiredField(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     requirement_id = Column(UUID(as_uuid=True), ForeignKey('country_legal_requirements.id'), nullable=False)
     name = Column(String(255), nullable=False)
+
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
     display_order = Column(Integer, nullable=False)
 
@@ -152,11 +141,13 @@ class LegalField(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
     name = Column(String(255), nullable=False)
+
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
-    value = Column(JSONB, nullable=False)
+    value = Column(JSONB, nullable=True)
 
     required = Column(Boolean, nullable=False, default=False)
     is_translatable = Column(Boolean, nullable=False, default=False)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
 
     company = relationship("Company", back_populates="legal_fields")
 
@@ -166,9 +157,12 @@ class SystemField(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
     name = Column(String(255), nullable=False)
+
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
-    value = Column(JSONB, nullable=False)
+    value = Column(JSONB, nullable=True)
+
     is_translatable = Column(Boolean, nullable=False, default=False)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
 
     company = relationship("Company", back_populates="system_fields")
 
@@ -178,11 +172,31 @@ class CustomField(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
     name = Column(String(255), nullable=False)
+
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
-    value = Column(JSONB, nullable=False)
+    value = Column(JSONB, nullable=True)
+
     is_translatable = Column(Boolean, nullable=False, default=False)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
 
     company = relationship("Company", back_populates="custom_fields")
+
+
+class Manager(Base):
+    __tablename__ = 'managers'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
+
+    position = Column(Enum(ManagerType, name='manager_type'), nullable=False)
+    inn = Column(Text, nullable=True)
+
+    full_name = Column(Text, nullable=True)
+    en_full_name = Column(Text, nullable=True)
+
+    since_on_position = Column(DateTime(timezone=True), nullable=True)
+
+    company = relationship("Company", back_populates="maangers")
 
 
 class Contact(Base):
@@ -191,6 +205,7 @@ class Contact(Base):
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
     type = Column(Enum(ContactType, name='contact_type'), nullable=False)
     value = Column(Text, nullable=False)
+
     is_verified = Column(Boolean, nullable=False, default=False)
 
     company = relationship("Company", back_populates="contacts")
