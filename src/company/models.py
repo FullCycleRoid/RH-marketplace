@@ -1,8 +1,8 @@
-import uuid
-from datetime import datetime
-from sqlalchemy import (Column, String, Integer, Boolean, ForeignKey, DateTime, DECIMAL, Text, Enum, func, UniqueConstraint, Index)
+from sqlalchemy import (Column, String, Integer, Boolean, ForeignKey, DateTime, DECIMAL, Text, Enum, func,
+                        UniqueConstraint, Index, DDL)
 from sqlalchemy.dialects.postgresql import UUID, JSONB
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.event import listen
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 from src import Base
@@ -32,7 +32,7 @@ class Company(Base):
     custom_fields = relationship("CustomField", back_populates="company", cascade="all, delete-orphan")
 
     contacts = relationship("Contact", back_populates="company", cascade="all, delete-orphan")
-    managers = relationship("Managers", back_populates="company", cascade="all, delete-orphan")
+    managers = relationship("Manager", back_populates="company", cascade="all, delete-orphan")
 
     financial_reports = relationship("FinancialReport", back_populates="company", cascade="all, delete-orphan")
     tax_reports = relationship("TaxReport", back_populates="company", cascade="all, delete-orphan")
@@ -86,6 +86,14 @@ class Company(Base):
         )
         self.tax_reports.append(report)
         return report
+
+
+class CompanyOKVED(Base):
+    __tablename__ = 'company_m2m_okved'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
+    okved_id = Column(Integer, ForeignKey('okved_nodes.id'), nullable=False)
 
 
 class CountryLegalRequirement(Base):
@@ -147,7 +155,7 @@ class LegalField(Base):
 
     required = Column(Boolean, nullable=False, default=False)
     is_translatable = Column(Boolean, nullable=False, default=False)
-    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True, default=True)
 
     company = relationship("Company", back_populates="legal_fields")
 
@@ -162,7 +170,7 @@ class SystemField(Base):
     value = Column(JSONB, nullable=True)
 
     is_translatable = Column(Boolean, nullable=False, default=False)
-    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True, default=True)
 
     company = relationship("Company", back_populates="system_fields")
 
@@ -177,7 +185,7 @@ class CustomField(Base):
     value = Column(JSONB, nullable=True)
 
     is_translatable = Column(Boolean, nullable=False, default=False)
-    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True)
+    translation_type = Column(Enum(TranslationType, name='translation_type'), nullable=True, default=True)
 
     company = relationship("Company", back_populates="custom_fields")
 
@@ -196,7 +204,7 @@ class Manager(Base):
 
     since_on_position = Column(DateTime(timezone=True), nullable=True)
 
-    company = relationship("Company", back_populates="maangers")
+    company = relationship("Company", back_populates="managers")
 
 
 class Contact(Base):
@@ -250,3 +258,7 @@ class CompanyChangeLog(Base):
     changes = Column(JSONB, nullable=False)
 
     company = relationship("Company", back_populates="change_logs")
+
+
+create_enum_type = DDL("CREATE TYPE translation_type AS ENUM ('manual', 'automatic');")
+listen(LegalField.__table__, 'before_create', create_enum_type.execute_if(dialect='postgresql'))

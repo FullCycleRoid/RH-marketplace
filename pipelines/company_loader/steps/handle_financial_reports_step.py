@@ -3,9 +3,6 @@ from pipelines.generic_pipeline import Context, NextStep
 from src.company.dto import FinancialReport
 
 
-
-
-
 class HandleFinancialReportStep:
     def __call__(self, context: Context, next_step: NextStep) -> None:
         annual_income = convert_to_numeric(context.raw_company.annual_income)

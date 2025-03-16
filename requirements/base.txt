@@ -1,5 +1,8 @@
-tensorflow
 mtranslate
+transformers
+sentencepiece
+sacremoses
+torch
 redis==5.0.*
 alembic==1.11.*
 bcrypt==4.0.*

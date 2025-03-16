@@ -31,10 +31,11 @@ class CompanyDTO:
     authorized_capital: Optional[int] = None
     average_number_of_employees: Optional[int] = None
 
-    advantages: Optional[dict] = None
-    en_advantages: Optional[dict] = None
+    advantages: Optional[dict] =  field(default_factory=list)
+    en_advantages: Optional[dict] =  field(default_factory=list)
 
     okveds: Optional[dict] = None
+    okved_ids: list[int] = field(default_factory=list)
 
     okogu_code: Optional[str] = None
     okopf_code: Optional[str] = None
@@ -42,8 +43,6 @@ class CompanyDTO:
     okato_code: Optional[str] = None
     oktmo_code: Optional[str] = None
     code_kladr: Optional[str] = None
-
-    en_reliability_assessment: List[str] = field(default_factory=list)
 
     contacts: List[Contact] = field(default_factory=list)
     addresses: List[Address] = field(default_factory=list)

@@ -4,37 +4,39 @@ from typing import Optional
 from sqlalchemy import or_, func
 from sqlalchemy.orm import Session
 
-from pipelines.connector import SessionFactory
+from pipelines.connector import ClusterDBSession, MarketplaceDBSession
 from pipelines.raw_model import RawCompany
 from datetime import datetime
+
+from src import OkvedNode
 from src.core.logger import logger
 
 
-def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
+def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = ClusterDBSession):
     with _session() as session:
         res = session.query(RawCompany).filter(RawCompany.legal_name != "Индивидуальный предприниматель").limit(BATCH_SIZE).offset(offset).all()
         return res
 
 
-def get_company_okved(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
+def get_company_okved(offset: int, BATCH_SIZE: int,  _session: Session = ClusterDBSession):
     with _session() as session:
         res = session.query(RawCompany.okved).limit(BATCH_SIZE).offset(offset).all()
         return res
 
 
-def get_random_company_okved(BATCH_SIZE: int = 10000, _session: Session = SessionFactory):
+def get_random_company_okved(BATCH_SIZE: int = 10000, _session: Session = ClusterDBSession):
     with _session() as session:
         # Случайным образом упорядочиваем записи и выбираем BATCH_SIZE записей
         res = session.query(RawCompany.okved).order_by(func.random()).limit(BATCH_SIZE).all()
         return res
 
 
-def get_total_count(_session: Session = SessionFactory):
+def get_total_count(_session: Session = ClusterDBSession):
     with _session() as session:
         return session.query(func.count(RawCompany.id)).scalar()
 
 
-def get_active_company_count(_session: Session = SessionFactory):
+def get_active_company_count(_session: Session = ClusterDBSession):
     with _session() as session:
         count = session.query(func.count()).filter(
             or_(
@@ -46,7 +48,7 @@ def get_active_company_count(_session: Session = SessionFactory):
         return count
 
 
-def get_entrepreneurs(offset: int, BATCH_SIZE: int,  _session: Session = SessionFactory):
+def get_entrepreneurs(offset: int, BATCH_SIZE: int,  _session: Session = ClusterDBSession):
     with _session() as session:
         res = session.query(RawCompany).filter(RawCompany.legal_entity_state == "Действующее ИП").limit(BATCH_SIZE).offset(offset).all()
         return res
@@ -108,3 +110,11 @@ def convert_to_numeric(value):
         return int(number * multipliers.get(unit, 1))
     except:
         return 0
+
+
+def get_okved_by_code(code: str, _session: Session = MarketplaceDBSession) -> Optional[str]:
+    with _session() as session:
+        res = session.query(OkvedNode).filter(OkvedNode.code == code).first()
+        if res is None:
+            print("Код не найден в базе данных")
+        return res

@@ -1,13 +1,23 @@
 from pipelines.generic_pipeline import Context, NextStep
+from src.core.language_translator.translator import translate_large_text
 
 
 class HandleReliabilityAssessmentStep:
     def __call__(self, context: Context, next_step: NextStep) -> None:
-        rewrite_assessment = []
+        ru_assessments = []
+        en_assessments = []
 
-        for assessment in context.raw_company.reliability_assessment[2:-2].split('","'):
-            rewrite_assessment.append(assessment)
+        r_assessment = context.raw_company.reliability_assessment
+        if "Реквизиты,ОГРН,ИНН,КПП" not in r_assessment:
+            if context.raw_company.reliability_assessment:
+                for assessment in r_assessment[2:-2].split('","'):
+                    ru_assessments.append(assessment)
+                    en_assessments.append(translate_large_text(assessment))
 
-        context.company_dto.reliability_assessment = rewrite_assessment
-
+                context.company_dto.advantages.extend(ru_assessments)
+                context.company_dto.en_advantages.extend(en_assessments)
+            print("***********   ReliabilityAssessment   ***********")
+            print(context.company_dto.advantages)
+            print(context.company_dto.en_advantages,)
+            print("**********************")
         next_step(context)

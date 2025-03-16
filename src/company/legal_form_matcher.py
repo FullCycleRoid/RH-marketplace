@@ -42,7 +42,3 @@ def find_by_abbr(abbr):
         if abbr in value['abbr']:
             return value['ru'], key
     return None
-
-# print(ru_to_en["Общество с ограниченной ответственностью"])  # {'full': 'Limited Liability Company', 'abbr': ['LLC', 'Ltd']}
-# print(en_to_ru["Joint Stock Company"])  # {'ru': 'Акционерное общество', 'abbr': ['JSC', 'PLC']}
-# print(find_by_abbr("LLC"))  # ('Общество с ограниченной ответственностью', 'Limited Liability Company')
