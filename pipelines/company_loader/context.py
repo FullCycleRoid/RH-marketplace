@@ -27,7 +27,6 @@ class CompanyDTO:
     ogrn: Optional[str] = None
     kpp: Optional[str] = None
     okpo: Optional[str] = None
-    legal_form: Optional[str] = None
     authorized_capital: Optional[int] = None
     average_number_of_employees: Optional[int] = None
 
@@ -45,7 +44,6 @@ class CompanyDTO:
     code_kladr: Optional[str] = None
 
     contacts: List[Contact] = field(default_factory=list)
-    addresses: List[Address] = field(default_factory=list)
     management: List[Manager] = field(default_factory=list)
 
     financial_reports: List[FinancialReport] = field(default_factory=list)

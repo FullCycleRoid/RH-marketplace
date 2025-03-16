@@ -2,10 +2,14 @@ from pipelines.utils import convert_ru_date_to_date_obj
 from pipelines.generic_pipeline import Context, NextStep
 from src.company.dto import Manager
 from src.company.enums import ManagerType
+from src.core.language_translator.generic_traslator import LangTranslator
 from src.core.language_translator.translator import translate_large_text
 
 
 class AddDirectorStep:
+    def __init__(self, translator: LangTranslator):
+        self.translator = translator
+
     def __call__(self, context: Context, next_step: NextStep) -> None:
         director_name = context.raw_company.director_name
         since_on_position = context.raw_company.director_since
@@ -19,12 +23,11 @@ class AddDirectorStep:
             CEO = Manager(
                     position=ManagerType.CEO,
                     full_name=director_name,
-                    en_full_name=translate_large_text(director_name, from_lang='ru', to_lang='en'),
+                    en_full_name=self.translator(director_name),
                     since_on_position=since_on_position
                 )
 
             context.company_dto.management.append(CEO)
-
         next_step(context)
 
     def split_full_name(self, director_name: str):

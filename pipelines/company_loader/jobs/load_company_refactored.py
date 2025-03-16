@@ -1,3 +1,4 @@
+import multiprocessing
 import time
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
@@ -16,8 +17,10 @@ from pipelines.company_loader.steps.match_legal_status_step import MatchLegalSta
 from pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
 from pipelines.utils import get_active_companies
 from pipelines.generic_pipeline import Pipeline, Context, error_handler
+from src.core.language_translator.generic_traslator import LangTranslator
 
 BATCH_SIZE = 10
+MAX_COMPANIES = 20_000_000
 
 
 def process_single_company(company, process_pipeline, error_handler):
@@ -47,7 +50,9 @@ def process_batch_threaded(batch, process_pipeline, error_handler):
 
 def process_batch_multiprocess(batch, process_pipeline, error_handler):
     """Многопроцессная обработка батча"""
-    with ProcessPoolExecutor() as executor:
+    ctx = multiprocessing.get_context("spawn")
+
+    with ProcessPoolExecutor(mp_context=ctx) as executor:
         futures = [
             executor.submit(
                 process_single_company,
@@ -97,28 +102,25 @@ def benchmark_processing():
     # print(f"Многопоточная обработка:   {thread_time:.2f} сек")
     print(f"Многопроцессная обработка: {process_time:.2f} сек")
 
-def start_process():
-    # count_companies = get_active_company_count()
-    # print(count_companies, 'count_companies')
+def start_process(translator: LangTranslator):
     offset = 0
-    max_companies = 20_000_000
 
     process_pipeline = Pipeline[Context](
-        CreateCompanyDTOStep(),
+        CreateCompanyDTOStep(translator),
         ConvertRegistrationDateStep(),
         MatchLegalStateStep(),
         ConvertAuthorizedCapitalStep(),
         ConvertAverageNumberOfEmployeesStep(),
         HandleContactsStep(),
-        AddDirectorStep(),
+        AddDirectorStep(translator),
         HandleFinancialReportStep(),
         HandleTaxReportStep(),
-        HandleReliabilityAssessmentStep(),
-        HandleAdvantagesStep(),
+        HandleReliabilityAssessmentStep(translator),
+        HandleAdvantagesStep(translator),
         OkvedM2MIdsStep(),
     )
 
-    while offset < max_companies:
+    while offset < MAX_COMPANIES:
         batch = get_active_companies(offset, BATCH_SIZE)
         if not batch:
             break
@@ -133,6 +135,7 @@ def start_process():
         print(f"{BATCH_SIZE} компаний обработано за {process_time:.2f} сек")
 
 if __name__ == '__main__':
+    translator = LangTranslator()
     # Для корректной работы multiprocessing в Windows
-    # benchmark_processing()  # Запуск сравнения производительности
-    start_process()  # Основной пайплайн
+    # benchmark_processing(translator)  # Запуск сравнения производительности
+    start_process(translator)  # Основной пайплайн

@@ -47,6 +47,12 @@ class EntityType(str, Enum):
 
 
 class FieldType(str, Enum):
+    LEGAL_FIELD = 'LEGAL_FIELD'
+    SYSTEM_FIELD = 'SYSTEM_FIELD'
+    USER_FIELD = 'USER_FIELD'
+
+
+class DataType(str, Enum):
     STRING = 'STRING'
     NUMBER = 'NUMBER'
     DATE = 'DATE'
