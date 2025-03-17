@@ -121,8 +121,8 @@ class CompanyFieldType(Base):
     __tablename__ = 'company_field_type'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
-    ru_name = Column(String(50), nullable=False)
-    en_name = Column(String(50), nullable=False)
+    ru_name = Column(String(50), nullable=False, unique=True)
+    en_name = Column(String(50), nullable=False, unique=True)
 
     ru_description = Column(Text, nullable=True)
     en_description = Column(Text, nullable=True)
