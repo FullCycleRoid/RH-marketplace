@@ -2,8 +2,8 @@ from pipelines.utils import convert_ru_date_to_date_obj
 from pipelines.generic_pipeline import Context, NextStep
 from src.company.dto import Manager
 from src.company.enums import ManagerType
-from src.core.language_translator.generic_traslator import LangTranslator
-from src.core.language_translator.translator import translate_large_text
+from src.core.language_translator.ml_traslator import LangTranslator
+from src.core.language_translator.google_translator import translate_large_text
 
 
 class AddDirectorStep:

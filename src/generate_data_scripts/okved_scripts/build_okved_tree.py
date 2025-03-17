@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src import OkvedNode
 from src.core.database.postgres.connectors import psycopg_sync_engine
-from src.core.language_translator.translator import translate_text
+from src.core.language_translator.google_translator import translate_text
 
 
 def load_okved_data(session, data, parent=None):

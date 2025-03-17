@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 
 from src import CatalogCategory
-from src.core.language_translator.translator import translate_large_text
+from src.core.language_translator.google_translator import translate_large_text
 
 Session = sessionmaker(bind=engine)
 session = Session()

@@ -17,7 +17,7 @@ from pipelines.company_loader.steps.match_legal_status_step import MatchLegalSta
 from pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
 from pipelines.utils import get_active_companies
 from pipelines.generic_pipeline import Pipeline, Context, error_handler
-from src.core.language_translator.generic_traslator import LangTranslator
+from src.core.language_translator.ml_traslator import LangTranslator
 
 BATCH_SIZE = 10
 MAX_COMPANIES = 20_000_000

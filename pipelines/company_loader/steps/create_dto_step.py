@@ -1,8 +1,8 @@
 from pipelines.company_loader.context import CompanyDTO
 from pipelines.generic_pipeline import Context, NextStep
 from src.company.enums import SystemStatus
-from src.core.language_translator.generic_traslator import LangTranslator
-from src.core.language_translator.translator import translate_large_text, translate_text
+from src.core.language_translator.ml_traslator import LangTranslator
+from src.core.language_translator.google_translator import translate_large_text, translate_text
 
 
 class CreateCompanyDTOStep:

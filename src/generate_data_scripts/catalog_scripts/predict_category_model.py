@@ -1,7 +1,26 @@
 import numpy as np
 import tensorflow as tf
 
-from src.generate_data_scripts.catalog_scripts.prepare_catalog_data import preprocess_text, vectorizer
+from src.generate_data_scripts.catalog_scripts.prepare_catalog_data_scratch import preprocess_text, vectorizer
+
+
+import pickle
+
+# Загрузка DataFrame
+with open("intermediate_data.pkl", "rb") as f:
+    df = pickle.load(f)
+
+# Загрузка TF-IDF векторов
+with open("tfidf_vectors.pkl", "rb") as f:
+    X = pickle.load(f)
+
+# Загрузка кластеризованных данных
+with open("clustered_data.pkl", "rb") as f:
+    df = pickle.load(f)
+
+# Загрузка названий кластеров
+with open("cluster_names.pkl", "rb") as f:
+    cluster_names = pickle.load(f)
 
 # Создание модели нейронной сети
 n_clusters = 50

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src import MKTUClassifier, MKTUCategories
 from src.core.database.postgres.connectors import psycopg_sync_engine
-from src.core.language_translator.translator import translate_text, translate_large_text
+from src.core.language_translator.google_translator import translate_text, translate_large_text
 
 
 def load_data_from_json(session, file_path):
