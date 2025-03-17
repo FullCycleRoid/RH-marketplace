@@ -104,6 +104,8 @@ class CompanyField(Base):
 
     json_data = Column(JSONB, nullable=True)
 
+    translation_config = Column(JSONB, nullable=True)
+
     company = relationship("Company", back_populates="company_fields")
 
 
@@ -115,27 +117,12 @@ class CompanyOKVED(Base):
     okved_id = Column(Integer, ForeignKey('okved_nodes.id'), nullable=False)
 
 
-class CountryRequirementFields(Base):
-    __tablename__ = 'country_requirement_fields'
+class CompanyFieldType(Base):
+    __tablename__ = 'company_field_type'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    country_code = Column(String(2), nullable=False)
-    version = Column(String(50), nullable=False)
 
-    fields = relationship("CountryField", back_populates="requirement_fields", cascade="all, delete-orphan")
-
-    __table_args__ = (
-        UniqueConstraint('country_code', 'version', name='uq_country_version'),
-        Index('idx_country_requirement_fields', country_code),
-    )
-
-
-class RequirementField(Base):
-    __tablename__ = 'requirement_fields'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    country_requirement_fields_id = Column(UUID(as_uuid=True), ForeignKey('country_requirement_fields.id'), nullable=False)
-
-    ru_name = Column(Text, nullable=False)
-    en_name = Column(Text, nullable=False)
+    ru_name = Column(String(50), nullable=False)
+    en_name = Column(String(50), nullable=False)
 
     ru_description = Column(Text, nullable=True)
     en_description = Column(Text, nullable=True)
@@ -144,14 +131,11 @@ class RequirementField(Base):
     field_type = Column(Enum(FieldType, name='field_type'), nullable=False)
     display_order = Column(Integer, nullable=False)
     required = Column(Boolean, nullable=False, default=False)
-    translation_settings = Column(JSONB, nullable=True)
 
-    requirement_fields = relationship("CountryRequirementFields", back_populates="fields")
     validation_rules = relationship("ValidationRule", back_populates="field", cascade="all, delete-orphan")
 
     __table_args__ = (
-        UniqueConstraint('country_requirement_fields_id', 'name', name='uq_country_requirement_fields_id'),
-        Index('idx_country_requirement_fields_id', country_requirement_fields_id)
+        UniqueConstraint('ru_name', name='uq_company_field_type'),
     )
 
 
