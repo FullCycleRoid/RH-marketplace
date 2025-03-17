@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-from src.generate_data_scripts.generate_catalog_scripts.prepare_catalog_data import preprocess_text, vectorizer
+from src.generate_data_scripts.catalog_scripts.prepare_catalog_data import preprocess_text, vectorizer
 
 # Создание модели нейронной сети
 n_clusters = 50
