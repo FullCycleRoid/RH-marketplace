@@ -55,3 +55,35 @@ class MKTUCategories(Base):
     name_en = Column(String)
 
     classifier = relationship("MKTUClassifier", back_populates="categories")
+
+
+class CatalogCategory(Base):
+    __tablename__ = 'catalog_categories'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)  # Название категории (напр., "Спорт и инвентарь")
+    parent_id = Column(Integer, ForeignKey('catalog_categories.id'))
+    en_name = Column(String)  # Перевод на английский
+
+    # Иерархия
+    parent = relationship('CatalogCategory', remote_side=[id], back_populates='children')
+    children = relationship('CatalogCategory', back_populates='parent')
+
+    # Связи с классификаторами
+    okved_nodes = relationship("OkvedNode", secondary="catalog_okved_links")
+    mktu_classes = relationship("MKTUClassifier", secondary="catalog_mktu_links")
+
+    def __repr__(self):
+        return f"<CatalogCategory(name={self.name})>"
+
+
+# Таблицы для связей многие-ко-многим
+class CatalogOkvedLink(Base):
+    __tablename__ = 'catalog_okved_links'
+    category_id = Column(Integer, ForeignKey('catalog_categories.id'), primary_key=True)
+    okved_id = Column(Integer, ForeignKey('okved_nodes.id'), primary_key=True)
+
+
+class CatalogMKTULink(Base):
+    __tablename__ = 'catalog_mktu_links'
+    category_id = Column(Integer, ForeignKey('catalog_categories.id'), primary_key=True)
+    mktu_id = Column(Integer, ForeignKey('MKTU_classifier.id'), primary_key=True)
