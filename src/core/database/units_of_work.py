@@ -11,7 +11,9 @@ class SQLAlchemyUnitOfWork(AbstractUnitOfWork):
     which would be based on SQLAlchemy logics.
     """
 
-    def __init__(self, session_factory: async_sessionmaker = PsycopgAsyncSessionFactory) -> None:
+    def __init__(
+        self, session_factory: async_sessionmaker = PsycopgAsyncSessionFactory
+    ) -> None:
         self._session_factory: async_sessionmaker = session_factory
 
     async def __aenter__(self) -> Self:

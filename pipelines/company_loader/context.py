@@ -3,9 +3,9 @@ from datetime import datetime
 from typing import List, Optional
 
 from pipelines.raw_model import RawCompany
-from src.company.dto import Contact, Address, Manager, FinancialReport, TaxReport
+from src.company.dto import Contact, FinancialReport, Manager, TaxReport
 from src.company.enums import LegalStatus, SystemStatus
-from src.company.models import Company
+from src.company.infrastructure.models import Company
 
 
 @dataclass

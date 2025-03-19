@@ -1,5 +1,5 @@
-from pipelines.utils import convert_to_numeric
 from pipelines.generic_pipeline import Context, NextStep
+from pipelines.utils import convert_to_numeric
 from src.company.dto import TaxReport
 
 

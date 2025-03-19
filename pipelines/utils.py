@@ -1,13 +1,12 @@
 import re
+from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import or_, func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from pipelines.connector import ClusterDBSession, MarketplaceDBSession
 from pipelines.raw_model import RawCompany
-from datetime import datetime
-
 from src import OkvedNode
 from src.core.logger import logger
 

@@ -67,7 +67,7 @@ def choose_verify_email_redirect_url() -> str:
     if settings.ENVIRONMENT.is_deployed:
         return settings.PROD_VERIFY_EMAIL_REDIRECT_URL
     elif settings.ENVIRONMENT.is_local:
-        return 'http://0.0.0.0:8000/marketplace/auth/users/verify_email/'
+        return "http://0.0.0.0:8000/marketplace/auth/users/verify_email/"
     else:
         return settings.DEV_VERIFY_EMAIL_REDIRECT_URL
 
@@ -76,14 +76,14 @@ def choose_forget_password_redirect_url() -> str:
     if settings.ENVIRONMENT.is_deployed:
         return settings.PROD_FORGET_PASSWORD_REDIRECT_URL
     elif settings.ENVIRONMENT.is_local:
-        return 'http://0.0.0.0:8000/marketplace/auth/users/new_password/'
+        return "http://0.0.0.0:8000/marketplace/auth/users/new_password/"
     else:
         return settings.DEV_FORGET_PASSWORD_REDIRECT_URL
 
 
 def build_full_paths_for_all_files_in_a_folder(folder_path: str) -> List[str]:
     files_path = []
-    for _, _, filenames in walk('/src/src/core/cache/dumps/gesn_catalog/'):
+    for _, _, filenames in walk("/src/src/core/cache/dumps/gesn_catalog/"):
         for filename in filenames:
             files_path.append(folder_path + filename)
 
@@ -92,9 +92,9 @@ def build_full_paths_for_all_files_in_a_folder(folder_path: str) -> List[str]:
 
 def current_base_url_domain() -> str:
     if settings.ENVIRONMENT.is_deployed:
-        return 'https://21yard.com'
+        return "https://21yard.com"
     else:
-        return 'https://dev.21yard.com'
+        return "https://dev.21yard.com"
 
 
 def __send_email(email_to: EmailStr, message_content: str):
@@ -103,7 +103,9 @@ def __send_email(email_to: EmailStr, message_content: str):
         server.sendmail(settings.SMTP_LOGIN, email_to, message_content)
 
 
-def transform_datetime_format(to_transform: datetime, datetime_format: str = DatetimeFormats.RUSSIAN) -> str:
+def transform_datetime_format(
+    to_transform: datetime, datetime_format: str = DatetimeFormats.RUSSIAN
+) -> str:
     return to_transform.strftime(datetime_format)
 
 

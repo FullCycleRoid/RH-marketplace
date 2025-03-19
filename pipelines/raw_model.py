@@ -1,7 +1,7 @@
-from sqlalchemy import Column, DateTime, String, Integer, text as satext
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import text as satext
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import declarative_base
-
 
 Base = declarative_base()
 

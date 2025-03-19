@@ -1,5 +1,5 @@
-from pipelines.utils import convert_ru_date_to_date_obj
 from pipelines.generic_pipeline import Context, NextStep
+from pipelines.utils import convert_ru_date_to_date_obj
 from src.company.enums import LegalStatus
 
 

@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 class OkvedMapper:
     def __init__(self, mapping_file_path):
         """

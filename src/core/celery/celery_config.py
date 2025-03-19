@@ -14,6 +14,8 @@ class Config:
     result_serializer = "json"
 
     task_default_queue = "celery_queue"
-    task_queues = (Queue("celery_queue", Exchange("celery_queue"), routing_key="celery_queue"),)
+    task_queues = (
+        Queue("celery_queue", Exchange("celery_queue"), routing_key="celery_queue"),
+    )
 
     beat_schedule = {}

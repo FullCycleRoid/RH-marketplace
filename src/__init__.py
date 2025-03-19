@@ -1,5 +1,6 @@
-from .core.database.declarative_base import Base
-from .auth.models import *
-from .company.models import *
+from src.company.infrastructure.models import *
+
+from .catalog.models import *
 from .chat.models import *
-from .classificators.models import *
+from .core.database.declarative_base import Base
+from .user.models import *

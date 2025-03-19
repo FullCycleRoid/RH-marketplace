@@ -1,6 +1,5 @@
 from pipelines.generic_pipeline import Context, NextStep
 
-
 ru_to_en = {
     "ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ": {"full": "LIMITED LIABILITY COMPANY", "abbr": ["LLC", "LTD"]},
     "АКЦИОНЕРНОЕ ОБЩЕСТВО": {"full": "JOINT STOCK COMPANY", "abbr": ["JSC", "PLC"]},

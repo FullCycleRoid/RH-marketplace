@@ -8,11 +8,15 @@ session = Session()
 
 # Создание категорий каталога
 for cluster_id, name in cluster_names.items():
-    parent = session.query(CatalogCategory).filter_by(cluster_id=df["parent_cluster"]).first()
+    parent = (
+        session.query(CatalogCategory)
+        .filter_by(cluster_id=df["parent_cluster"])
+        .first()
+    )
     category = CatalogCategory(
         name=name.capitalize(),
         en_name=translate_large_text(name),  # Функция перевода
-        parent=parent
+        parent=parent,
     )
     session.add(category)
 

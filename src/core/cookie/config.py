@@ -8,4 +8,5 @@ class CookiesConfig(BaseSettings):
     HTTP_ONLY: bool = True
     SAME_SITE: str = "Lax"
 
+
 cookies_config = CookiesConfig()

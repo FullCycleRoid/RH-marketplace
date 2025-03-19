@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 from abc import abstractmethod
-from typing import Generic, List, TypeVar, Callable, Protocol, Generator, Union, Iterable, Optional
+from typing import (Callable, Generator, Generic, Iterable, List, Optional,
+                    Protocol, TypeVar, Union)
 
 from src.core.logger import logger
 

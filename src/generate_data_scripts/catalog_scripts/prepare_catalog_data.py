@@ -1,21 +1,26 @@
-import os
 import json
+import os
 import pickle
-import tensorflow as tf
+
 import pandas as pd
+import tensorflow as tf
 from gensim.models import Word2Vec
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
-from src.generate_data_scripts.catalog_scripts.prepare_catalog_data_scratch import preprocess_text
+
+from src.generate_data_scripts.catalog_scripts.prepare_catalog_data_scratch import (
+    preprocess_text,
+)
 
 
 def load_classifier(path: str) -> dict:
-    with open(path, 'r', encoding='utf-8') as file:
+    with open(path, "r", encoding="utf-8") as file:
         return json.load(file)
+
 
 # Загрузка данных ОКВЕД и МКТУ
 okved_data = load_classifier("../okved_scripts/оквэд.json")  # Ваша функция для загрузки
-mktu_data = load_classifier("../mktu_scripts/mktu.json")    # Ваша функция для загрузки
+mktu_data = load_classifier("../mktu_scripts/mktu.json")  # Ваша функция для загрузки
 
 
 # Проверка, существуют ли уже сохраненные данные
@@ -31,12 +36,24 @@ else:
     data = []
     step = 0
     for item in okved_data:
-        data.append({"text": preprocess_text(item["name"]), "source": "okved", "code": item["code"]})
+        data.append(
+            {
+                "text": preprocess_text(item["name"]),
+                "source": "okved",
+                "code": item["code"],
+            }
+        )
         print(step)
         step += 1
 
     for item in mktu_data:
-        data.append({"text": preprocess_text(item["content"] + " " + item["products"]), "source": "mktu", "code": item["name"]})
+        data.append(
+            {
+                "text": preprocess_text(item["content"] + " " + item["products"]),
+                "source": "mktu",
+                "code": item["name"],
+            }
+        )
         print(step)
         step += 1
 

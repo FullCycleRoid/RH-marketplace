@@ -1,5 +1,6 @@
 from pipelines.generic_pipeline import Context, NextStep
 
+
 class ConvertAverageNumberOfEmployeesStep:
     def __call__(self, context: Context, next_step: NextStep) -> None:
         raw_data = context.raw_company.average_number_of_employees

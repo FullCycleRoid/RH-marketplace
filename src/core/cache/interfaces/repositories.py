@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Any
+from typing import Any, Optional
 
 from src.core.cache.models import CacheModel
 
@@ -13,7 +13,9 @@ class AbstractCacheRepository(ABC):
     """
 
     @abstractmethod
-    async def set_data(self, cache_data: CacheModel, is_transaction: bool = False) -> None:
+    async def set_data(
+        self, cache_data: CacheModel, is_transaction: bool = False
+    ) -> None:
         raise NotImplementedError
 
     @abstractmethod

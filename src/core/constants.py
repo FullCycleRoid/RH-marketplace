@@ -1,6 +1,5 @@
-from typing import Tuple, Any, Dict
 from dataclasses import astuple, dataclass
-
+from typing import Any, Dict, Tuple
 
 DB_NAMING_CONVENTION = {
     "ix": "%(column_0_label)s_idx",
@@ -29,4 +28,4 @@ class ErrorCode:
 
 @dataclass(frozen=True)
 class DatetimeFormats:
-    RUSSIAN: str = '%d.%m.%Y %H:%M:%S'
+    RUSSIAN: str = "%d.%m.%Y %H:%M:%S"

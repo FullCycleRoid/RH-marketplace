@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class EnvRedirectUrlsEnum(str, Enum):
-    AUTO_CP: str = 'auto_cp'
-    SHORT_AUTO_CP: str = 'short_auto_cp'
-    VERIFY_EMAIL: str = 'verify_email'
-    FORGET_PASSWORD: str = 'forget_password'
+    AUTO_CP: str = "auto_cp"
+    SHORT_AUTO_CP: str = "short_auto_cp"
+    VERIFY_EMAIL: str = "verify_email"
+    FORGET_PASSWORD: str = "forget_password"
 
 
 class Environment(str, Enum):

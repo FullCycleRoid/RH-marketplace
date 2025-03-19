@@ -1,5 +1,5 @@
-from fastapi import FastAPI
 import numpy as np
+from fastapi import FastAPI
 
 app = FastAPI()
 
@@ -8,12 +8,14 @@ model = tf.keras.models.load_model("category_classifier_model.keras")
 with open("tfidf_vectorizer.pkl", "rb") as f:
     vectorizer = pickle.load(f)
 
+
 # Функция для предсказания категории
 def predict_category(text):
     processed = preprocess_text(text)
     vector = vectorizer.transform([processed])
     prediction = model.predict(vector.toarray())
     return cluster_names[np.argmax(prediction)]
+
 
 # Пример маршрута в FastAPI
 @app.post("/predict")
@@ -23,6 +25,7 @@ async def predict(product_description: str):
 
 
 import pickle
+
 import tensorflow as tf
 
 # Сохранение модели
@@ -33,6 +36,7 @@ with open("tfidf_vectorizer.pkl", "wb") as f:
     pickle.dump(vectorizer, f)
 
 import pickle
+
 import tensorflow as tf
 
 # Загрузка модели

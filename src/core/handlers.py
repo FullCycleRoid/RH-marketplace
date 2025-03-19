@@ -10,17 +10,19 @@ def response_contract_http_exception_handler(request: Request, exc: HTTPExceptio
             "success": False,
             "error": exc.detail,
             "data": None,
-            "status": exc.status_code
-        }
+            "status": exc.status_code,
+        },
     )
 
 
-def response_contract_validation_exception_handler(request: Request, exc: RequestValidationError):
+def response_contract_validation_exception_handler(
+    request: Request, exc: RequestValidationError
+):
     error_msg: str
-    if exc.errors()[0]['msg'].startswith('Value'):
-        error_msg: str = exc.errors()[0]['msg'].split('error, ')[1]
+    if exc.errors()[0]["msg"].startswith("Value"):
+        error_msg: str = exc.errors()[0]["msg"].split("error, ")[1]
     else:
-        error_msg: str = exc.errors()[0]['msg']
+        error_msg: str = exc.errors()[0]["msg"]
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -28,6 +30,6 @@ def response_contract_validation_exception_handler(request: Request, exc: Reques
             "success": False,
             "error": error_msg,
             "data": None,
-            "status": status.HTTP_422_UNPROCESSABLE_ENTITY
-        }
+            "status": status.HTTP_422_UNPROCESSABLE_ENTITY,
+        },
     )

@@ -1,4 +1,5 @@
 from typing import Any
+
 from pydantic_settings import BaseSettings
 
 from src.core.enums import Environment

@@ -1,4 +1,5 @@
 import datetime
+
 from fastapi import Response
 
 from src.core.cookie.config import cookies_config
@@ -12,11 +13,16 @@ def set_cookie(response: Response, key: str, value: str, expire_days: int) -> Re
         secure=cookies_config.SECURE_COOKIES,
         expires=expires.strftime("%a, %d-%b-%Y %T GMT"),
         httponly=cookies_config.HTTP_ONLY,
-        samesite=cookies_config.SAME_SITE
+        samesite=cookies_config.SAME_SITE,
     )
     return response
 
 
 def delete_cookie(response: Response, key: str):
-    response.delete_cookie(key=key, secure=cookies_config.SECURE_COOKIES, httponly=cookies_config.HTTP_ONLY, samesite=cookies_config.SAME_SITE)
+    response.delete_cookie(
+        key=key,
+        secure=cookies_config.SECURE_COOKIES,
+        httponly=cookies_config.HTTP_ONLY,
+        samesite=cookies_config.SAME_SITE,
+    )
     return response

@@ -1,5 +1,5 @@
 from pipelines.generic_pipeline import Context, NextStep
-from src.company.models import Company
+from src.company.infrastructure.models import Company
 
 
 class CreateCompanyORMStep:
