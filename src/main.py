@@ -28,13 +28,6 @@ async def healthcheck() -> dict[str, str]:
     return {"status": "ok"}
 
 
-user_app.container.parent = app.container
-company_app.container.parent = app.container
-catalog_app.container.parent = app.container
-chat_app.container.parent = app.container
-products_app.container.parent = app.container
-
-
 def mount_subapp(main_app: FastAPI, path: str, subapp: FastAPI):
     # Передача контейнера в подприложение
     if hasattr(main_app, "container"):
