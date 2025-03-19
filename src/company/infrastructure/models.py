@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import uuid4
 
 from sqlalchemy import (
@@ -75,52 +76,69 @@ class Company(Base):
         Index("idx_legal_status", legal_status),
     )
 
-    def add_legal_field(
-        self,
-        company_id,
-        requirement_id,
-        ru_data,
-        en_data,
-        json_data,
+    def add_field(
+            self,
+            company_field_type_id: UUID,
+            ru_data: str = None,
+            en_data: str = None,
+            json_data: dict = None
     ):
-        legal_field = CompanyField(
-            company_id=company_id,
-            requirement_id=requirement_id,
+        """Добавляет новое поле компании"""
+        field = CompanyField(
+            company_id=self.id,
+            company_field_type_id=company_field_type_id,
             ru_data=ru_data,
             en_data=en_data,
-            json_data=json_data,
+            json_data=json_data
         )
-        self.legal_fields.append(legal_field)
-        return legal_field
+        self.fields.append(field)
+        return field
 
-    def add_contact(self, contact_type, value):
-        contact = Contact(company_id=self.id, type=contact_type, value=value)
-        self.contacts.append(contact)
-        return contact
-
-    def add_financial_report(self, year, annual_income, net_profit, currency):
-        report = FinancialReport(
+    def add_manager(
+            self,
+            position: ManagerType,
+            full_name: str,
+            en_full_name: str = None,
+            inn: str = None,
+            since_on_position: datetime = None
+    ):
+        """Добавляет менеджера компании"""
+        manager = Manager(
             company_id=self.id,
-            year=year,
-            annual_income=annual_income,
-            net_profit=net_profit,
-            currency=currency,
-            status=ReportStatus.DRAFT,
+            position=position,
+            full_name=full_name,
+            en_full_name=en_full_name,
+            inn=inn,
+            since_on_position=since_on_position
         )
-        self.financial_reports.append(report)
-        return report
+        self.managers.append(manager)
+        return manager
 
-    def add_tax_report(self, year, quarter, period_start, period_end):
-        report = TaxReport(
+    def update_system_status(self, new_status: SystemStatus):
+        """Обновляет системный статус компании"""
+        self.system_status = new_status
+        self.updated_at = func.now()
+        return self
+
+    def log_change(
+            self,
+            entity_type: EntityType,
+            entity_id: UUID,
+            user_id: int,
+            changes: dict,
+            reason: str = None
+    ):
+        """Создает запись в логе изменений"""
+        log_entry = CompanyChangeLog(
             company_id=self.id,
-            year=year,
-            quarter=quarter,
-            period_start=period_start,
-            period_end=period_end,
-            status=ReportStatus.DRAFT,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            user_id=user_id,
+            changes=changes,
+            reason=reason
         )
-        self.tax_reports.append(report)
-        return report
+        self.change_logs.append(log_entry)
+        return log_entry
 
 
 class CompanyFieldType(Base):
