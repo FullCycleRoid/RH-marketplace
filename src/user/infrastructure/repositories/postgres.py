@@ -7,7 +7,9 @@ from src.core.database.declarative_base import Base
 from src.core.database.repositories import SQLAlchemyRepository
 from src.user.infrastructure.models import User, UserRole
 from src.user.infrastructure.repositories.interfaces import (
-    UserRolesRepository, UsersRepository)
+    UserRolesRepository,
+    UsersRepository,
+)
 
 
 class SQLAlchemyUsersRepository(SQLAlchemyRepository, UsersRepository):

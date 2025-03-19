@@ -1,29 +1,40 @@
 from fastapi import APIRouter, Depends, Response, status
 
 from src.auth.config import auth_config
-from src.tasks.tasks import (send_forget_password_email,
-                             send_verify_email_message)
-from src.user.presentation.dependencies import change_forgotten_password
-from src.user.presentation.dependencies import \
-    change_old_password as change_old_password_dependency
-from src.user.presentation.dependencies import create_refresh_token
-from src.user.presentation.dependencies import \
-    delete_my_account as delete_my_account_dependency
-from src.user.presentation.dependencies import get_my_account as get_my_account_dependency
-from src.user.presentation.dependencies import (get_user_by_refresh_token, login_user,
-                                                register_user)
-from src.user.presentation.dependencies import \
-    update_user_phone as update_user_phone_dependency
-from src.user.presentation.dependencies import \
-    update_user_profile as update_user_profile_dependency
-from src.user.presentation.dependencies import valid_user_email
-from src.user.presentation.dependencies import \
-    validate_access_token as validate_access_token_dependency
-from src.user.presentation.dependencies import verify_user_email
+from src.tasks.tasks import send_forget_password_email, send_verify_email_message
 from src.user.infrastructure.models import RefreshToken, User
-from src.user.security import (create_access_token,
-                               create_forget_password_token,
-                               create_verify_email_token)
+from src.user.presentation.dependencies import change_forgotten_password
+from src.user.presentation.dependencies import (
+    change_old_password as change_old_password_dependency,
+)
+from src.user.presentation.dependencies import create_refresh_token
+from src.user.presentation.dependencies import (
+    delete_my_account as delete_my_account_dependency,
+)
+from src.user.presentation.dependencies import (
+    get_my_account as get_my_account_dependency,
+)
+from src.user.presentation.dependencies import (
+    get_user_by_refresh_token,
+    login_user,
+    register_user,
+)
+from src.user.presentation.dependencies import (
+    update_user_phone as update_user_phone_dependency,
+)
+from src.user.presentation.dependencies import (
+    update_user_profile as update_user_profile_dependency,
+)
+from src.user.presentation.dependencies import valid_user_email
+from src.user.presentation.dependencies import (
+    validate_access_token as validate_access_token_dependency,
+)
+from src.user.presentation.dependencies import verify_user_email
+from src.user.security import (
+    create_access_token,
+    create_forget_password_token,
+    create_verify_email_token,
+)
 from src.user.utils import get_cookie_settings
 
 router = APIRouter()

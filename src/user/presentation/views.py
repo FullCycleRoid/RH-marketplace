@@ -12,13 +12,13 @@ class UserViews:
         self.session = session
 
     async def get_user_by_id(self, user_id: int) -> User:
-        get_user_by_id_stmt = ''
+        get_user_by_id_stmt = ""
         cursor: Result = await self.session.execute(
             text(get_user_by_id_stmt).params(user_id=user_id)
         )
         return User(**cursor.mappings().first())
 
     async def get_all_users(self) -> List[User]:
-            get_all_users_stmt = ''
-            cursor: Result = await self.session.execute(text(get_all_users_stmt))
-            return [User(**user) for user in cursor.mappings().all()]
+        get_all_users_stmt = ""
+        cursor: Result = await self.session.execute(text(get_all_users_stmt))
+        return [User(**user) for user in cursor.mappings().all()]

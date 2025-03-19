@@ -1,14 +1,34 @@
 from uuid import uuid4
 
-from sqlalchemy import (DECIMAL, Boolean, Column, DateTime, Enum, ForeignKey,
-                        Index, Integer, String, Text, UniqueConstraint, func)
+from sqlalchemy import (
+    DECIMAL,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
 from src import Base
-from src.company.enums import (ContactType, DataType, EntityType, FieldType,
-                               LegalStatus, ManagerType, ReportStatus,
-                               SystemStatus, ValidationType)
+from src.company.enums import (
+    ContactType,
+    DataType,
+    EntityType,
+    FieldType,
+    LegalStatus,
+    ManagerType,
+    ReportStatus,
+    SystemStatus,
+    ValidationType,
+)
 
 
 class Company(Base):

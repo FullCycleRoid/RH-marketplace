@@ -4,8 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import Result, delete, insert, select, update
 
-from src.auth.infrastructure.repositories.interfaces import \
-    RefreshTokensRepository
+from src.auth.infrastructure.repositories.interfaces import RefreshTokensRepository
 from src.core.database.declarative_base import Base
 from src.core.database.repositories import SQLAlchemyRepository
 from src.user.infrastructure.models import RefreshToken

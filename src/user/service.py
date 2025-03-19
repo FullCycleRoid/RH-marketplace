@@ -7,8 +7,7 @@ from src.config import settings
 from src.core.cache.redis.DTO import CacheModel
 from src.core.cache.redis.units_of_work import RedisUnitOfWork
 from src.core.exceptions import RedisKeyNotFound
-from src.user.exceptions import (RefreshTokenNotFound, RefreshTokenNotValid,
-                                 UserNotFound)
+from src.user.exceptions import RefreshTokenNotFound, RefreshTokenNotValid, UserNotFound
 from src.user.infrastructure.models import RefreshToken, User, UserRole
 from src.user.interfaces.units_of_work import UsersUnitOfWork
 

@@ -8,26 +8,40 @@ from pydantic import EmailStr
 
 from src.auth.config import auth_config
 from src.core.cache.redis.units_of_work import RedisUnitOfWork
-from src.core.security.jwt import (oauth2_scheme, parse_jwt_data_from_oauth2,
-                                   parse_jwt_data_from_token,
-                                   refresh_token_scheme)
+from src.core.security.jwt import (
+    oauth2_scheme,
+    parse_jwt_data_from_oauth2,
+    parse_jwt_data_from_token,
+    refresh_token_scheme,
+)
 from src.core.utils import BasicCodeGenerator
-from src.user.exceptions import (EmailAlreadyConfirmed, EmailNotConfirmed,
-                                 EmailTaken, ExpiredToken,
-                                 IncorrectOldPassword, InvalidCredentials,
-                                 InvalidToken, PhoneTaken,
-                                 RefreshTokenNotValid, UserNotFound,
-                                 UserPhoneAlreadyVerified)
+from src.user.exceptions import (
+    EmailAlreadyConfirmed,
+    EmailNotConfirmed,
+    EmailTaken,
+    ExpiredToken,
+    IncorrectOldPassword,
+    InvalidCredentials,
+    InvalidToken,
+    PhoneTaken,
+    RefreshTokenNotValid,
+    UserNotFound,
+    UserPhoneAlreadyVerified,
+)
 from src.user.infrastructure.models import RefreshToken, User
-from src.user.presentation.schemas import (ChangeForgottenPasswordScheme,
-                                           ChangeOldPasswordScheme, JWTData,
-                                           LoginUserScheme, RegisterUserScheme,
-                                           UpdateUserPhoneScheme,
-                                           UpdateUserProfileScheme)
+from src.user.presentation.schemas import (
+    ChangeForgottenPasswordScheme,
+    ChangeOldPasswordScheme,
+    JWTData,
+    LoginUserScheme,
+    RegisterUserScheme,
+    UpdateUserPhoneScheme,
+    UpdateUserProfileScheme,
+)
+from src.user.presentation.views import AuthViews
 from src.user.security import check_password, hash_password
 from src.user.service import AuthService, RedisAuthService
 from src.user.units_of_work import SQLAlchemyUsersUnitOfWork
-from src.user.presentation.views import AuthViews
 
 
 async def register_user(user_data: RegisterUserScheme) -> User:
