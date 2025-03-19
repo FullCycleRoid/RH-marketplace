@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from src import Base
 from src.company.enums import LegalStatus, EntityType, FieldType, ValidationType, ContactType, \
-    ReportStatus, SystemStatus, TranslationType, ManagerType, DataType
+    ReportStatus, SystemStatus, ManagerType, DataType
 
 
 class Company(Base):
@@ -93,34 +93,11 @@ class Company(Base):
         return report
 
 
-class CompanyField(Base):
-    __tablename__ = 'company_fields'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
-    requirement_id = Column(UUID(as_uuid=True), ForeignKey('requirement_fields.id'), nullable=False)
-
-    ru_data = Column(Text, nullable=True)
-    en_data = Column(Text, nullable=True)
-
-    json_data = Column(JSONB, nullable=True)
-
-    translation_config = Column(JSONB, nullable=True)
-
-    company = relationship("Company", back_populates="company_fields")
-
-
-class CompanyOKVED(Base):
-    __tablename__ = 'company_m2m_okved'
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
-    okved_id = Column(Integer, ForeignKey('okved_nodes.id'), nullable=False)
-
-
 class CompanyFieldType(Base):
     __tablename__ = 'company_field_type'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
 
+    country_code = Column(String(2), nullable=False)
     ru_name = Column(String(50), nullable=False, unique=True)
     en_name = Column(String(50), nullable=False, unique=True)
 
@@ -132,6 +109,7 @@ class CompanyFieldType(Base):
     display_order = Column(Integer, nullable=False)
     required = Column(Boolean, nullable=False, default=False)
 
+    fields = relationship("CompanyField", back_populates="field_type")
     validation_rules = relationship("ValidationRule", back_populates="field", cascade="all, delete-orphan")
 
     __table_args__ = (
@@ -142,12 +120,37 @@ class CompanyFieldType(Base):
 class ValidationRule(Base):
     __tablename__ = 'validation_rules'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    field_id = Column(UUID(as_uuid=True), ForeignKey('required_fields.id'), nullable=False)
+    company_field_type_id = Column(UUID(as_uuid=True), ForeignKey('company_field_type.id'), nullable=False)
     validation_type = Column(Enum(ValidationType, name='validation_type'), nullable=False)
     params = Column(JSONB, nullable=False)
     error_code = Column(String(50), nullable=False)
 
-    field = relationship("CountryField", back_populates="validation_rules")
+    field = relationship("CompanyFieldType", back_populates="validation_rules")
+
+
+class CompanyField(Base):
+    __tablename__ = 'company_fields'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
+    company_field_type_id = Column(UUID(as_uuid=True), ForeignKey('company_field_type.id'), nullable=False)
+
+    ru_data = Column(Text, nullable=True)
+    en_data = Column(Text, nullable=True)
+
+    json_data = Column(JSONB, nullable=True)
+
+    translation_config = Column(JSONB, nullable=True)
+
+    field_type = relationship("CompanyFieldType", back_populates="fields")
+    company = relationship("Company", back_populates="fields")
+
+
+class CompanyOKVED(Base):
+    __tablename__ = 'company_m2m_okved'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=False)
+    okved_id = Column(Integer, ForeignKey('okved_nodes.id'), nullable=False)
 
 
 class Manager(Base):
