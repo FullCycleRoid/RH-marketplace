@@ -1,15 +1,8 @@
 from datetime import datetime
 from typing import Any, Optional
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    EmailStr,
-    Field,
-    constr,
-    field_validator,
-    model_validator,
-)
+from pydantic import (BaseModel, ConfigDict, EmailStr, Field, constr,
+                      field_validator, model_validator)
 
 from src.user.utils import validate_phone_number
 

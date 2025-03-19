@@ -4,7 +4,7 @@ from sqlalchemy import Result
 from sqlalchemy.sql import text
 
 from src.core.database.units_of_work import SQLAlchemyUnitOfWork
-from src.user.models import User
+from src.user.infrastructure.models import User
 from src.user.sql_statements import get_all_users_stmt, get_user_by_id_stmt
 
 

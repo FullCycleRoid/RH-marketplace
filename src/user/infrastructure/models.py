@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy import (Boolean, Column, DateTime, Enum, ForeignKey, Integer,
+                        String)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -57,14 +58,3 @@ class UserRole(Base):
 
     def __repr__(self):
         return f"<User(id={self.id}, name='{self.name}>"
-
-
-class RefreshToken(Base):
-    __tablename__ = "refresh_token"
-
-    uuid = Column(UUID, primary_key=True)
-    refresh_token = Column(String, nullable=False)
-
-    expires_at = Column(DateTime(timezone=True), onupdate=func.now())
-    created_time = Column(DateTime(timezone=True), onupdate=func.now())
-    updated_time = Column(DateTime(timezone=True), onupdate=func.now())

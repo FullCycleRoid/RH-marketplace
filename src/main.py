@@ -6,10 +6,12 @@ from src.catalog.main import app as catalog_app
 from src.catalog.main import app as company_app
 from src.chat.main import app as chat_app
 from src.config import app_configs, settings
+from src.container import BaseContainer
 from src.products.main import app as products_app
 from src.user.main import app as user_app
 
 app = FastAPI(**app_configs)
+app.container = BaseContainer()
 
 
 app.add_middleware(
@@ -26,11 +28,25 @@ async def healthcheck() -> dict[str, str]:
     return {"status": "ok"}
 
 
-app.mount(path="/api/user", app=user_app, name="User app")
-app.mount(path="/api/company", app=company_app, name="Company app")
-app.mount(path="/api/catalog", app=catalog_app, name="Catalog app")
-app.mount(path="/api/chat", app=chat_app, name="Chat app")
-app.mount(path="/api/products", app=products_app, name="Products app")
+user_app.container.parent = app.container
+company_app.container.parent = app.container
+catalog_app.container.parent = app.container
+chat_app.container.parent = app.container
+products_app.container.parent = app.container
+
+
+def mount_subapp(main_app: FastAPI, path: str, subapp: FastAPI):
+    # Передача контейнера в подприложение
+    if hasattr(main_app, "container"):
+        subapp.container.parent = main_app.container
+    main_app.mount(path, subapp)
+
+
+mount_subapp(app, "/api/user", user_app)
+mount_subapp(app, "/api/company", company_app)
+mount_subapp(app, "/api/catalog", catalog_app)
+mount_subapp(app, "/api/chat", chat_app)
+mount_subapp(app, "/api/products", products_app)
 
 
 if settings.ENVIRONMENT.is_local:

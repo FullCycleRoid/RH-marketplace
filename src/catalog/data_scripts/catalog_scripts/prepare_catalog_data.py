@@ -8,9 +8,8 @@ from gensim.models import Word2Vec
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from src.generate_data_scripts.catalog_scripts.prepare_catalog_data_scratch import (
-    preprocess_text,
-)
+from src.catalog.data_scripts.catalog_scripts.prepare_catalog_data_scratch import \
+    preprocess_text
 
 
 def load_classifier(path: str) -> dict:

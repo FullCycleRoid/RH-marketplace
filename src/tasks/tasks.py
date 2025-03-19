@@ -10,18 +10,13 @@ from src.core.celery.utility import post_request
 from src.core.logger import logger
 from src.core.utils import __send_email
 from src.tasks.email_create import (
-    create_accept_code_content,
-    create_administration_feedback_content,
-    create_analytics_feedback_content,
-    create_application_contacts_content,
+    create_accept_code_content, create_administration_feedback_content,
+    create_analytics_feedback_content, create_application_contacts_content,
     create_application_response_declined_content,
     create_change_password_verification_email,
     create_email_message_for_chosen_performer_template,
-    create_forget_password_content,
-    create_invoice_pdf_content,
-    create_verify_email_content,
-    new_application_response_email_content,
-)
+    create_forget_password_content, create_invoice_pdf_content,
+    create_verify_email_content, new_application_response_email_content)
 
 
 @celery.task

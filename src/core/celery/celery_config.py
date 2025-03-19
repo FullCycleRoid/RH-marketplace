@@ -1,6 +1,6 @@
 from kombu import Exchange, Queue
 
-from src.core.cache.redis.utils import REDIS_URL
+from src.core.cache.redis.client import REDIS_URL
 
 
 class Config:

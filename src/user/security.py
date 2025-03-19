@@ -1,9 +1,9 @@
 import hashlib
 from datetime import datetime, timedelta
 
+from src.auth.config import auth_config
 from src.core.security.jwt import create_jwt_token
-from src.user.config import auth_config
-from src.user.models import User
+from src.user.infrastructure.models import User
 
 
 def hash_password(password: str) -> str:

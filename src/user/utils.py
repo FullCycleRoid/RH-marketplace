@@ -4,7 +4,7 @@ from typing import Any
 from email_validator import validate_email
 from email_validator.exceptions_types import EmailSyntaxError
 
-from src.user.config import auth_config
+from src.auth.config import auth_config
 from src.user.exceptions import EmailNotValid
 
 

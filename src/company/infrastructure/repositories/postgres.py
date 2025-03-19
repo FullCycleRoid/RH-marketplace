@@ -5,19 +5,11 @@ from uuid import UUID
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from src.company.enums import (
-    EntityType,
-    FieldType,
-    FiledStatus,
-    LegalStatus,
-    ValidationType,
-)
-from src.company.infrastructure.models import (
-    Company,
-    CountryLegalRequirement,
-    Translation,
-    ValidationRule,
-)
+from src.company.enums import (EntityType, FieldType, FiledStatus, LegalStatus,
+                               ValidationType)
+from src.company.infrastructure.models import (Company,
+                                               CountryLegalRequirement,
+                                               Translation, ValidationRule)
 from src.company.repository import CountryLegalRequirementRepository
 
 

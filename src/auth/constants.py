@@ -1,0 +1,10 @@
+class ErrorCode:
+    AUTHENTICATION_REQUIRED = "Войдите в аккаунт"
+    AUTHORIZATION_FAILED = "К сожалению, вы не можете выполнить это действие"
+    INVALID_TOKEN = "Некорректный аутентификациооный токен"
+    EXPIRED_TOKEN = "Срок действия токена истек"
+    INVALID_CREDENTIALS = "Неверный логин или пароль"
+    REFRESH_TOKEN_NOT_VALID = "Некорректный токен обновления пользовательских данных"
+    REFRESH_TOKEN_REQUIRED = "Требуется токен обновления пользовательских данных"
+    INCORRECT_OLD_PASSWORD = "Неверный пароль"
+    REFRESH_TOKEN_NOT_FOUND = "Токен обновления пользовательских данных не найден"

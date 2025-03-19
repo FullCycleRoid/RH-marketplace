@@ -3,10 +3,8 @@ import pickle
 import numpy as np
 import tensorflow as tf
 
-from src.generate_data_scripts.catalog_scripts.prepare_catalog_data_scratch import (
-    preprocess_text,
-    vectorizer,
-)
+from src.catalog.data_scripts.catalog_scripts.prepare_catalog_data_scratch import (
+    preprocess_text, vectorizer)
 
 # Загрузка DataFrame
 with open("intermediate_data.pkl", "rb") as f:

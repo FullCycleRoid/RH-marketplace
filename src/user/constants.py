@@ -1,21 +1,12 @@
 class ErrorCode:
-    AUTHENTICATION_REQUIRED = "Войдите в аккаунт"
-    AUTHORIZATION_FAILED = "К сожалению, вы не можете выполнить это действие"
-    INVALID_TOKEN = "Некорректный аутентификациооный токен"
-    EXPIRED_TOKEN = "Срок действия токена истек"
-    INVALID_CREDENTIALS = "Неверный логин или пароль"
     EMAIL_TAKEN = "Аккаунт с такой почтой уже существует"
     EMAIL_NOT_VALID = "К сожалению, на этот электронный адрес невозможно зарегистрировать аккаунт. Используйте другую почту"
-    PHONE_TAKEN = "Аккаунт с таким номером уже существует"
-    REFRESH_TOKEN_NOT_VALID = "Некорректный токен обновления пользовательских данных"
-    REFRESH_TOKEN_REQUIRED = "Требуется токен обновления пользовательских данных"
     USER_NOT_FOUND = "Пользователь не найден"
     INVALID_CONFIRMATION_CODE = "Неверный код подтверждения"
     CONFIRMATION_CODE_EXPIRED = "Срок действия кода истек"
     EMAIL_ALREADY_CONFIRMED = "Вы уже подтвердили адрес электронной почты"
     EMAIL_NOT_CONFIRMED = "Подтвердите адрес электронной почты"
     INCORRECT_OLD_PASSWORD = "Неверный пароль"
-    REFRESH_TOKEN_NOT_FOUND = "Токен обновления пользовательских данных не найден"
     TELEGRAM_USERNAME_OR_ID_ALREADY_EXISTS = (
         "Телеграмм аккаунт уже привязан к другому аккаунту 21YARD"
     )

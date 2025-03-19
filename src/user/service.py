@@ -4,12 +4,13 @@ from typing import List, Optional
 from uuid import UUID
 
 from src.config import settings
-from src.core.cache.models import CacheModel
+from src.core.cache.redis.DTO import CacheModel
 from src.core.cache.redis.units_of_work import RedisUnitOfWork
 from src.core.exceptions import RedisKeyNotFound
-from src.user.exceptions import RefreshTokenNotFound, RefreshTokenNotValid, UserNotFound
+from src.user.exceptions import (RefreshTokenNotFound, RefreshTokenNotValid,
+                                 UserNotFound)
+from src.user.infrastructure.models import RefreshToken, User, UserRole
 from src.user.interfaces.units_of_work import UsersUnitOfWork
-from src.user.models import RefreshToken, User, UserRole
 
 
 class AuthService:

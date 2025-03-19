@@ -1,10 +1,5 @@
-from src.core.exceptions import (
-    AlreadyExist,
-    BadRequest,
-    NotAuthenticated,
-    NotFound,
-    PermissionDenied,
-)
+from src.core.exceptions import (AlreadyExist, BadRequest, NotAuthenticated,
+                                 NotFound, PermissionDenied)
 from src.user.constants import ErrorCode
 
 

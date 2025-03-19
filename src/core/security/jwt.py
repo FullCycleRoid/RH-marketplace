@@ -6,9 +6,9 @@ from fastapi.security import APIKeyCookie, OAuth2
 from jose import JWTError, jwt
 from starlette.requests import Request
 
-from src.user.config import auth_config
+from src.auth.config import auth_config
 from src.user.exceptions import AuthorizationFailed, ExpiredToken, InvalidToken
-from src.user.schemas import JWTData
+from src.user.presentation.schemas import JWTData
 
 
 class OAuth2Cookie(OAuth2):
