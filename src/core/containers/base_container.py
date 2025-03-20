@@ -3,7 +3,8 @@ from dependency_injector import containers, providers
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.core.config.config import create_config_adapter, settings
+from src.core.config.adapter import create_config_adapter
+from src.core.config.config import settings
 
 
 class BaseContainer(containers.DeclarativeContainer):

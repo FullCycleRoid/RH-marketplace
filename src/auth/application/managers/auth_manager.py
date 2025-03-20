@@ -1,5 +1,6 @@
 from src.auth.application.di import AuthServiceDep, CacheServiceDep
 from src.auth.infrastructure.models import User
+from src.core.security.jwt import JWTData
 
 
 class AuthManager:

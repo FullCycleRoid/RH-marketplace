@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from src.core.database.declarative_base import Base
+from src.core.database.declarative_base import BaseMT
 
 
 class AbstractRepository(ABC):
@@ -13,15 +13,15 @@ class AbstractRepository(ABC):
     """
 
     @abstractmethod
-    async def add(self, model: Base) -> Base:
+    async def add(self, model: BaseMT) -> BaseMT:
         raise NotImplementedError
 
     @abstractmethod
-    async def get(self, id: int) -> Optional[Base]:
+    async def get(self, id: int) -> Optional[BaseMT]:
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, id: int, model: Base) -> Base:
+    async def update(self, id: int, model: BaseMT) -> BaseMT:
         raise NotImplementedError
 
     @abstractmethod
@@ -29,5 +29,5 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def list(self) -> List[Base]:
+    async def list(self) -> List[BaseMT]:
         raise NotImplementedError

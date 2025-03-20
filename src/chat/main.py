@@ -1,20 +1,12 @@
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
 
-from src.core.config.config import app_configs
-
-app = FastAPI(**app_configs)
+from src.core.containers.chat_container import ChatContainer
+from src.main import base_container
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def create_subapp(container_cls) -> FastAPI:
+    subapp = FastAPI()
+    subapp.container = container_cls(parent=base_container)
+    return subapp
 
-
-@app.get("/healthcheck", include_in_schema=False)
-async def healthcheck() -> dict[str, str]:
-    return {"status": "ok"}
+chat_app = create_subapp(ChatContainer)

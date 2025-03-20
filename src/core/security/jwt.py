@@ -7,11 +7,11 @@ from pydantic import ConfigDict, Field
 
 from src.auth.config import auth_config
 from src.auth.exceptions import ExpiredToken, InvalidToken
-from src.core.interfaces.models import BaseModel
+from src.core.interfaces.dto import BaseDTO
 from src.core.security.oauth import oauth2_scheme
 
 
-class JWTData(BaseModel):
+class JWTData(BaseDTO):
     user_id: int = Field(alias="sub")
     expires: datetime = Field(alias="exp")
 

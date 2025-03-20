@@ -3,8 +3,7 @@ from dependency_injector import containers, providers
 from src.auth.application.managers.auth_manager import AuthManager
 from src.auth.application.services.auth_servcies import AuthService
 from src.auth.application.services.user_services import RedisUserService
-from src.auth.infrastructure.repositories.postgres import \
-    SQLAlchemyRefreshTokensRepository
+from src.auth.infrastructure.repositories.postgres import SQLAlchemyRefreshTokensRepository
 
 
 class AuthContainer(containers.DeclarativeContainer):

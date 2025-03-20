@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Set
 
 
 @dataclass
-class BaseModel(ABC):
+class BaseDTO(ABC):
     """
     Base model, from which any domain model should be inherited.
     """

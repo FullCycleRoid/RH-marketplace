@@ -1,7 +1,7 @@
 import pytest
 
 from src.core.config.config import Config, create_config_adapter
-from src.core.container import BaseContainer
+from src.core.containers.base_container import BaseContainer
 
 
 @pytest.fixture

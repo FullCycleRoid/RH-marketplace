@@ -4,7 +4,7 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-from src.core.container import BaseContainer
+from src.core.containers.base_container import BaseContainer
 
 
 async def get_db_session(

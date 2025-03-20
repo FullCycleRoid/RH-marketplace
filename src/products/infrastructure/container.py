@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from src.core.container import BaseContainer
+from src.core.containers.base_container import BaseContainer
 
 
 class Container(BaseContainer):
