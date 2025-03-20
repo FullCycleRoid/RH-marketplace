@@ -1,7 +1,6 @@
 from abc import ABC
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
+from src.core.database.session import AsyncSessionDep
 from src.core.interfaces.repositories import AbstractRepository
 
 
@@ -11,5 +10,5 @@ class SQLAlchemyRepository(AbstractRepository, ABC):
     which would be based on SQLAlchemy logics.
     """
 
-    def __init__(self, session: AsyncSession) -> None:
-        self._session: AsyncSession = session
+    def __init__(self, session: AsyncSessionDep) -> None:
+        self.session = session

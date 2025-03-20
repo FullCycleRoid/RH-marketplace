@@ -10,7 +10,6 @@ class PydanticSettingsAdapter:
         return getattr(self._settings, key, default)
 
 
-# Фабрика для создания адаптера
 def create_config_adapter(settings: BaseSettings) -> providers.Configuration:
     adapter = PydanticSettingsAdapter(settings)
     config = providers.Configuration()

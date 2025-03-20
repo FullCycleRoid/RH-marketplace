@@ -7,7 +7,7 @@ from typing import List
 
 from pydantic import EmailStr
 
-from src.config import settings
+from src.core.config.config import settings
 from src.core.constants import DatetimeFormats
 from src.core.enums import EnvRedirectUrlsEnum
 

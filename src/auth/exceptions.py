@@ -1,11 +1,6 @@
-from src.core.exceptions import (
-    AlreadyExist,
-    BadRequest,
-    NotAuthenticated,
-    NotFound,
-    PermissionDenied,
-)
-from src.user.constants import ErrorCode
+from src.auth.constants import ErrorCode
+from src.core.exceptions import (AlreadyExist, BadRequest, NotAuthenticated,
+                                 NotFound, PermissionDenied)
 
 
 class AuthRequired(NotAuthenticated):

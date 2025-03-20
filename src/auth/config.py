@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic_settings import BaseSettings
 
 
@@ -20,3 +22,19 @@ class AuthConfig(BaseSettings):
 
 
 auth_config = AuthConfig()
+
+
+def get_cookie_settings(
+    key: str, value: str, max_age: int = 0, expired: bool = False
+) -> dict[str, Any]:
+
+    base_cookie = {
+        "key": key,
+        "httponly": auth_config.HTTP_ONLY,
+        "samesite": auth_config.SAME_SITE,
+        "secure": auth_config.SECURE_COOKIES,
+    }
+    if expired:
+        return base_cookie
+
+    return {**base_cookie, "value": value, "max_age": max_age}

@@ -1,27 +1,9 @@
 import re
-from typing import Any
 
 from email_validator import validate_email
 from email_validator.exceptions_types import EmailSyntaxError
 
-from src.auth.config import auth_config
-from src.user.exceptions import EmailNotValid
-
-
-def get_cookie_settings(
-    key: str, value: str, max_age: int = 0, expired: bool = False
-) -> dict[str, Any]:
-
-    base_cookie = {
-        "key": key,
-        "httponly": auth_config.HTTP_ONLY,
-        "samesite": auth_config.SAME_SITE,
-        "secure": auth_config.SECURE_COOKIES,
-    }
-    if expired:
-        return base_cookie
-
-    return {**base_cookie, "value": value, "max_age": max_age}
+from src.auth.exceptions import EmailNotValid
 
 
 def validate_email_or_raise_error(email: str):

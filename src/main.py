@@ -2,13 +2,13 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from src.auth.main import app as user_app
 from src.catalog.main import app as catalog_app
 from src.catalog.main import app as company_app
 from src.chat.main import app as chat_app
-from src.config import app_configs, settings
-from src.container import BaseContainer
+from src.core.config.config import app_configs, settings
+from src.core.container import BaseContainer
 from src.products.main import app as products_app
-from src.user.main import app as user_app
 
 app = FastAPI(**app_configs)
 app.container = BaseContainer()

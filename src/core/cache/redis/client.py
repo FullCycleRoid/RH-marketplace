@@ -1,6 +1,6 @@
 from redis.asyncio import Redis
 
-from src.config import settings
+from src.core.config.config import settings
 
 REDIS_URL = (
     f"redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}"

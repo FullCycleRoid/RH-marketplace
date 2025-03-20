@@ -1,35 +1,15 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import (
-    DECIMAL,
-    Boolean,
-    Column,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Index,
-    Integer,
-    String,
-    Text,
-    UniqueConstraint,
-    func,
-)
+from sqlalchemy import (DECIMAL, Boolean, Column, DateTime, Enum, ForeignKey,
+                        Index, Integer, String, Text, UniqueConstraint, func)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
 from src import Base
-from src.company.enums import (
-    ContactType,
-    DataType,
-    EntityType,
-    FieldType,
-    LegalStatus,
-    ManagerType,
-    ReportStatus,
-    SystemStatus,
-    ValidationType,
-)
+from src.company.enums import (ContactType, DataType, EntityType, FieldType,
+                               LegalStatus, ManagerType, ReportStatus,
+                               SystemStatus, ValidationType)
 
 
 class Company(Base):
@@ -77,11 +57,11 @@ class Company(Base):
     )
 
     def add_field(
-            self,
-            company_field_type_id: UUID,
-            ru_data: str = None,
-            en_data: str = None,
-            json_data: dict = None
+        self,
+        company_field_type_id: UUID,
+        ru_data: str = None,
+        en_data: str = None,
+        json_data: dict = None,
     ):
         """Добавляет новое поле компании"""
         field = CompanyField(
@@ -89,18 +69,18 @@ class Company(Base):
             company_field_type_id=company_field_type_id,
             ru_data=ru_data,
             en_data=en_data,
-            json_data=json_data
+            json_data=json_data,
         )
         self.fields.append(field)
         return field
 
     def add_manager(
-            self,
-            position: ManagerType,
-            full_name: str,
-            en_full_name: str = None,
-            inn: str = None,
-            since_on_position: datetime = None
+        self,
+        position: ManagerType,
+        full_name: str,
+        en_full_name: str = None,
+        inn: str = None,
+        since_on_position: datetime = None,
     ):
         """Добавляет менеджера компании"""
         manager = Manager(
@@ -109,7 +89,7 @@ class Company(Base):
             full_name=full_name,
             en_full_name=en_full_name,
             inn=inn,
-            since_on_position=since_on_position
+            since_on_position=since_on_position,
         )
         self.managers.append(manager)
         return manager
@@ -121,12 +101,12 @@ class Company(Base):
         return self
 
     def log_change(
-            self,
-            entity_type: EntityType,
-            entity_id: UUID,
-            user_id: int,
-            changes: dict,
-            reason: str = None
+        self,
+        entity_type: EntityType,
+        entity_id: UUID,
+        user_id: int,
+        changes: dict,
+        reason: str = None,
     ):
         """Создает запись в логе изменений"""
         log_entry = CompanyChangeLog(
@@ -135,7 +115,7 @@ class Company(Base):
             entity_id=entity_id,
             user_id=user_id,
             changes=changes,
-            reason=reason
+            reason=reason,
         )
         self.change_logs.append(log_entry)
         return log_entry

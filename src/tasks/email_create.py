@@ -8,7 +8,7 @@ import pytz
 from jinja2 import Template
 from pydantic import EmailStr
 
-from src.config import settings
+from src.core.config.config import settings
 from src.core.enums import EnvRedirectUrlsEnum
 from src.core.utils import choose_env_redirect_url, current_base_url_domain
 from src.templates.templates import get_email_templates
