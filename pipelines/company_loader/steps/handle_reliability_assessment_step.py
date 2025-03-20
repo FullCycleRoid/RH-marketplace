@@ -1,10 +1,9 @@
 from pipelines.generic_pipeline import Context, NextStep
 from src.core.language_translator.google_translator import translate_large_text
-from src.core.language_translator.ml_traslator import LangTranslator
 
 
 class HandleReliabilityAssessmentStep:
-    def __init__(self, translator: LangTranslator = None):
+    def __init__(self, translator = None):
         self.translator = translator
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
@@ -16,7 +15,6 @@ class HandleReliabilityAssessmentStep:
             if context.raw_company.reliability_assessment:
                 for assessment in r_assessment[2:-2].split('","'):
                     ru_assessments.append(assessment)
-                    # en_assessments.append(self.translator(assessment))
                     en_assessments.append(translate_large_text(assessment))
 
                 context.company_dto.advantages.extend(ru_assessments)

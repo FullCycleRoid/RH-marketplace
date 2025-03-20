@@ -26,7 +26,7 @@ from pipelines.company_loader.steps.match_legal_status_step import \
 from pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
 from pipelines.generic_pipeline import Context, Pipeline, error_handler
 from pipelines.utils import get_active_companies
-from src.core.language_translator.ml_traslator import LangTranslator
+
 
 BATCH_SIZE = 100
 MAX_COMPANIES = 20_000_000
@@ -73,32 +73,7 @@ def process_batch_multiprocess(batch, process_pipeline, error_handler):
         for future in futures:
             future.result()
 
-def benchmark_processing():
-    """Сравнение времени разных методов обработки"""
-    test_batch = get_active_companies(0, BATCH_SIZE)
-    process_pipeline = Pipeline[Context](
-        CreateCompanyDTOStep(),
-        ConvertRegistrationDateStep(),
-        MatchLegalStateStep(),
-        ConvertAuthorizedCapitalStep(),
-        ConvertAverageNumberOfEmployeesStep(),
-        HandleContactsStep(),
-        AddDirectorStep(),
-        HandleFinancialReportStep(),
-        HandleTaxReportStep(),
-        HandleReliabilityAssessmentStep(),
-        HandleAdvantagesStep(),
-        OkvedM2MIdsStep(),
-    )
-
-    start = time.perf_counter()
-    process_batch_multiprocess(test_batch, process_pipeline, error_handler)
-    process_time = time.perf_counter() - start
-
-    print(f"\nРезультаты сравнения (батч {BATCH_SIZE} компаний):")
-    print(f"Многопроцессная обработка: {process_time:.2f} сек")
-
-def start_process(translator: LangTranslator = None):
+def start_process(translator = None):
     offset = 0
 
     process_pipeline = Pipeline[Context](
@@ -114,6 +89,7 @@ def start_process(translator: LangTranslator = None):
         HandleReliabilityAssessmentStep(translator),
         HandleAdvantagesStep(translator),
         OkvedM2MIdsStep(),
+        BuildCompanyDBModel(),
     )
 
     while offset < MAX_COMPANIES:
@@ -123,7 +99,6 @@ def start_process(translator: LangTranslator = None):
 
         start = time.perf_counter()
         process_batch_multiprocess(batch, process_pipeline, error_handler)
-        # process_batch_threaded(batch, process_pipeline, error_handler)
         process_time = time.perf_counter() - start
 
         offset += BATCH_SIZE
@@ -131,7 +106,4 @@ def start_process(translator: LangTranslator = None):
         print(f"{BATCH_SIZE} компаний обработано за {process_time:.2f} сек")
 
 if __name__ == '__main__':
-    # translator = LangTranslator()
-    # Для корректной работы multiprocessing в Windows
-    # benchmark_processing(translator)  # Запуск сравнения производительности
-    start_process()  # Основной пайплайн
+    start_process()

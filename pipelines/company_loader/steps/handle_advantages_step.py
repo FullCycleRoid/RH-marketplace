@@ -3,31 +3,41 @@ from typing import List
 
 from pipelines.generic_pipeline import Context, NextStep
 from src.core.language_translator.google_translator import translate_large_text
-from src.core.language_translator.ml_traslator import LangTranslator
 
 
 class HandleAdvantagesStep:
-    def __init__(self, translator: LangTranslator = None):
+    def __init__(self, translator = None):
         self.translator = translator
 
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
-
         advantages = context.raw_company.advantages
+        seen = dict()
+        en_advantages = []
+
         if advantages:
             fixed_json_string = '[' + context.raw_company.advantages.strip('{}') + ']'
 
             try:
                 ru_advantages: List[str] = json.loads(fixed_json_string)
                 ru_advantages = [item.split(": ")[1] for item in ru_advantages]
-                # en_advantages = [self.translator(adv) for adv in ru_advantages]
-                en_advantages = [translate_large_text(adv) for adv in ru_advantages]
+
+                for adv in ru_advantages:
+                    if adv in seen:
+                        en_adv = seen[adv]
+
+                    if adv not in seen:
+                        en_adv = translate_large_text(adv)
+                        seen[adv] = en_adv
+                    en_advantages.append(en_adv)
+
                 print('*********** ADVANTAGES *************')
                 print(ru_advantages)
                 print(en_advantages)
                 context.company_dto.ru_advantages = ru_advantages
                 context.company_dto.en_advantages = en_advantages
                 print('**************************************')
+
             except json.JSONDecodeError as e:
                 print(f"Failed to decode JSON: {e}")
                 raise
