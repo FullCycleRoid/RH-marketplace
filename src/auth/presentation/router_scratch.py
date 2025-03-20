@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, Response, status
 
 from src.auth.config import auth_config
-from src.auth.security import (
-    create_access_token,
-    create_forget_password_token,
-    create_verify_email_token,
-)
+from src.auth.security import (create_access_token,
+                               create_forget_password_token,
+                               create_verify_email_token)
 from src.auth.validators import get_cookie_settings
-from src.tasks.tasks import send_forget_password_email, send_verify_email_message
+from src.tasks.tasks import (send_forget_password_email,
+                             send_verify_email_message)
 
 router = APIRouter()
 

@@ -7,9 +7,17 @@ from src.catalog.main import catalog_app
 from src.chat.main import chat_app
 from src.company.main import company_app
 from src.core.config.config import app_configs, settings
+from src.core.containers import base_container
 from src.products.main import product_app
 
 app = FastAPI(**app_configs)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await base_container.redis_repo().client.close()
+    await base_container.async_engine().dispose()
+
 
 app.add_middleware(
     CORSMiddleware,

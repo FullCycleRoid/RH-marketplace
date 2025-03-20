@@ -3,6 +3,7 @@ from dependency_injector import containers, providers
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from src.core.cache.redis.repositories import RedisRepository
 from src.core.config.adapter import create_config_adapter
 from src.core.config.config import settings
 
@@ -13,9 +14,9 @@ class BaseContainer(containers.DeclarativeContainer):
     # Асинхронный движок PostgreSQL
     async_engine = providers.Singleton(
         create_async_engine,
-        f"postgresql+asyncpg://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}",
-        echo=settings.DB_ECHO,
-        pool_size=settings.POOL_SIZE,
+        f"postgresql+asyncpg://{config.POSTGRES_USER}:{config.POSTGRES_PASSWORD}@{config.POSTGRES_HOST}:{config.POSTGRES_PORT}/{config.POSTGRES_DB}",
+        echo=config.DB_ECHO,
+        pool_size=config.POOL_SIZE,
     )
 
     # Фабрика асинхронных сессий SQLAlchemy
@@ -28,11 +29,15 @@ class BaseContainer(containers.DeclarativeContainer):
         autocommit=False,
     )
 
+    async_session = providers.Resource(
+        async_session_factory
+    )
+
     # Redis пул соединений
     redis_pool = providers.Singleton(
         Redis.ConnectionPool.from_url,
-        f"redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}",
-        max_connections=settings.MAX_POOL_CONNECTIONS,
+        f"redis://:{config.REDIS_PASSWORD}@{config.REDIS_HOST}:{config.REDIS_PORT}",
+        max_connections=config.MAX_POOL_CONNECTIONS,
         decode_responses=True,
     )
 
@@ -40,4 +45,9 @@ class BaseContainer(containers.DeclarativeContainer):
     redis_client = providers.Singleton(
         Redis,
         connection_pool=redis_pool,
+    )
+
+    redis_repo = providers.Singleton(
+        RedisRepository,
+        client=redis_client
     )

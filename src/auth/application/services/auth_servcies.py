@@ -4,9 +4,8 @@ from uuid import UUID
 
 from src.auth.exceptions import RefreshTokenNotFound, RefreshTokenNotValid
 from src.auth.infrastructure.models import RefreshToken, User
-from src.auth.infrastructure.repositories.postgres import (
-    SQLAlchemyRefreshTokensRepository,
-)
+from src.auth.infrastructure.repositories.postgres import \
+    SQLAlchemyRefreshTokensRepository
 
 
 class AuthService:
