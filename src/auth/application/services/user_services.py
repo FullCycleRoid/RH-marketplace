@@ -3,8 +3,7 @@ from typing import List, Optional
 
 from src.auth.exceptions import UserNotFound
 from src.auth.infrastructure.models import User, UserRole
-from src.auth.infrastructure.repositories.postgres import \
-    SQLAlchemyUsersRepository
+from src.auth.infrastructure.repositories.postgres import SQLAlchemyUsersRepository
 from src.core.cache.redis.DTO import CacheModel
 from src.core.cache.redis.repositories import RedisRepository
 from src.core.config.config import settings

@@ -1,7 +1,13 @@
 from typing import Any, Optional
 
-from pydantic import (BaseModel, EmailStr, Field, constr, field_validator,
-                      model_validator)
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+    constr,
+    field_validator,
+    model_validator,
+)
 
 from src.auth.validators import validate_phone_number
 
@@ -45,24 +51,6 @@ class RegisterUserScheme(LoginUserScheme, UpdateUserProfileScheme):
     @field_validator("phone", mode="before")
     @classmethod
     def validate_phone_with_regex(cls, value: str) -> str:
-        """
-        Ориентировано на российские мобильные + городские с кодом из 3 цифр (например, Москва).
-
-        Пропускает следующие типы номеров:
-        +79261234567
-        89261234567
-        79261234567
-        +7 926 123 45 67
-        +7 926 123 4567
-        +7 926 1234567
-        8(926)123-45-67
-        8-(926)-123-45-67
-        8-926-123-45-67
-        8 927 1234 234
-        8 927 12 12 888
-        8 927 12 555 12
-        8 927 123 8 123
-        """
         return validate_phone_number(phone=value)
 
 

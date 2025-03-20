@@ -9,4 +9,5 @@ def create_subapp(container_cls) -> FastAPI:
     subapp.container = container_cls(parent=base_container)
     return subapp
 
+
 chat_app = create_subapp(ChatContainer)

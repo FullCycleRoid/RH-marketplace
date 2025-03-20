@@ -6,7 +6,10 @@ from sqlalchemy import Result, delete, insert, select, update
 
 from src.auth.infrastructure.models import RefreshToken, User, UserRole
 from src.auth.infrastructure.repositories.interfaces import (
-    RefreshTokensRepository, UserRolesRepository, UsersRepository)
+    RefreshTokensRepository,
+    UserRolesRepository,
+    UsersRepository,
+)
 from src.core.database.declarative_base import Base
 from src.core.database.repositories import SQLAlchemyRepository
 

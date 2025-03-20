@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional, Set, TypeVar
 
 from sqlalchemy.orm import DeclarativeBase
 
-BaseMT = TypeVar('BaseMT', bound='Base')
+BaseMT = TypeVar("BaseMT", bound="Base")
 
 
 class Base(DeclarativeBase):

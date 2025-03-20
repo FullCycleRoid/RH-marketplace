@@ -7,10 +7,12 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from src.core.database.postgres.connectors import (PsycopgAsyncSessionFactory,
-                                                   PsycopgSyncSessionFactory,
-                                                   psycopg_engine,
-                                                   psycopg_sync_engine)
+from src.core.database.postgres.connectors import (
+    PsycopgAsyncSessionFactory,
+    PsycopgSyncSessionFactory,
+    psycopg_engine,
+    psycopg_sync_engine,
+)
 from src.core.logger import logger
 
 

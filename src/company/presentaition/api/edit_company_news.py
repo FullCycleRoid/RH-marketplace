@@ -2,8 +2,9 @@ from fastapi import Depends, status
 
 from src.company.router import router
 from src.user.infrastructure.models import User
-from src.user.presentation.dependencies import \
-    get_my_account as get_my_account_dependency
+from src.user.presentation.dependencies import (
+    get_my_account as get_my_account_dependency,
+)
 
 
 @router.put(
