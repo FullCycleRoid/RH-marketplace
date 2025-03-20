@@ -2,11 +2,12 @@ import json
 from typing import List
 
 from pipelines.generic_pipeline import Context, NextStep
+from src.core.language_translator.google_translator import translate_large_text
 from src.core.language_translator.ml_traslator import LangTranslator
 
 
 class HandleAdvantagesStep:
-    def __init__(self, translator: LangTranslator):
+    def __init__(self, translator: LangTranslator = None):
         self.translator = translator
 
 
@@ -19,7 +20,8 @@ class HandleAdvantagesStep:
             try:
                 ru_advantages: List[str] = json.loads(fixed_json_string)
                 ru_advantages = [item.split(": ")[1] for item in ru_advantages]
-                en_advantages = [self.translator(adv) for adv in ru_advantages]
+                # en_advantages = [self.translator(adv) for adv in ru_advantages]
+                en_advantages = [translate_large_text(adv) for adv in ru_advantages]
                 print('*********** ADVANTAGES *************')
                 print(ru_advantages)
                 print(en_advantages)

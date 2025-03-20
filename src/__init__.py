@@ -1,6 +1,5 @@
 from src.company.infrastructure.models import *
-from src.user.infrastructure.models import *
+from src.catalog.models import *
+from src.chat.models import *
 
-from .catalog.models import *
-from .chat.models import *
 from .core.database.declarative_base import Base

@@ -6,11 +6,10 @@ from sqlalchemy import (DECIMAL, Boolean, Column, DateTime, Enum, ForeignKey,
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
-from src import Base
 from src.company.enums import (ContactType, DataType, EntityType, FieldType,
                                LegalStatus, ManagerType, ReportStatus,
                                SystemStatus, ValidationType)
-
+from src.core.database.declarative_base import Base
 
 class Company(Base):
     __tablename__ = "companies"

@@ -28,7 +28,7 @@ from pipelines.generic_pipeline import Context, Pipeline, error_handler
 from pipelines.utils import get_active_companies
 from src.core.language_translator.ml_traslator import LangTranslator
 
-BATCH_SIZE = 10
+BATCH_SIZE = 100
 MAX_COMPANIES = 20_000_000
 
 
@@ -91,27 +91,14 @@ def benchmark_processing():
         OkvedM2MIdsStep(),
     )
 
-    # # Тестируем последовательную обработку
-    # start = time.perf_counter()
-    # process_batch_sequential(test_batch, process_pipeline, error_handler)
-    # seq_time = time.perf_counter() - start
-    #
-    # # Тестируем многопоточную обработку
-    # start = time.perf_counter()
-    # process_batch_threaded(test_batch, process_pipeline, error_handler)
-    # thread_time = time.perf_counter() - start
-
-    # Тестируем многопроцессную обработку
     start = time.perf_counter()
     process_batch_multiprocess(test_batch, process_pipeline, error_handler)
     process_time = time.perf_counter() - start
 
     print(f"\nРезультаты сравнения (батч {BATCH_SIZE} компаний):")
-    # print(f"Последовательная обработка: {seq_time:.2f} сек")
-    # print(f"Многопоточная обработка:   {thread_time:.2f} сек")
     print(f"Многопроцессная обработка: {process_time:.2f} сек")
 
-def start_process(translator: LangTranslator):
+def start_process(translator: LangTranslator = None):
     offset = 0
 
     process_pipeline = Pipeline[Context](
@@ -144,7 +131,7 @@ def start_process(translator: LangTranslator):
         print(f"{BATCH_SIZE} компаний обработано за {process_time:.2f} сек")
 
 if __name__ == '__main__':
-    translator = LangTranslator()
+    # translator = LangTranslator()
     # Для корректной работы multiprocessing в Windows
     # benchmark_processing(translator)  # Запуск сравнения производительности
-    start_process(translator)  # Основной пайплайн
+    start_process()  # Основной пайплайн

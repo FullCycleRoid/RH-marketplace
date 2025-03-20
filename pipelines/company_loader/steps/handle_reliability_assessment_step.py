@@ -4,7 +4,7 @@ from src.core.language_translator.ml_traslator import LangTranslator
 
 
 class HandleReliabilityAssessmentStep:
-    def __init__(self, translator: LangTranslator):
+    def __init__(self, translator: LangTranslator = None):
         self.translator = translator
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
@@ -16,7 +16,8 @@ class HandleReliabilityAssessmentStep:
             if context.raw_company.reliability_assessment:
                 for assessment in r_assessment[2:-2].split('","'):
                     ru_assessments.append(assessment)
-                    en_assessments.append(self.translator(assessment))
+                    # en_assessments.append(self.translator(assessment))
+                    en_assessments.append(translate_large_text(assessment))
 
                 context.company_dto.advantages.extend(ru_assessments)
                 context.company_dto.en_advantages.extend(en_assessments)

@@ -7,7 +7,7 @@ from src.core.language_translator.ml_traslator import LangTranslator
 
 
 class CreateCompanyDTOStep:
-    def __init__(self, translator: LangTranslator):
+    def __init__(self, translator: LangTranslator = None):
         self.translator = translator
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
@@ -19,7 +19,8 @@ class CreateCompanyDTOStep:
             legal_name=context.raw_company.legal_name,
             en_legal_name=translate_text(context.raw_company.legal_name),
             legal_address=context.raw_company.legal_address,
-            en_legal_address=self.translator(context.raw_company.legal_address),
+            # en_legal_address=self.translator(context.raw_company.legal_address),
+            en_legal_address=translate_large_text(context.raw_company.legal_address),
             inn=context.raw_company.inn,
             ogrn=context.raw_company.ogrn,
             kpp=context.raw_company.kpp,

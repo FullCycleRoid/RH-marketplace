@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import UUID
 
 from src.company.enums import (AddressType, ContactType, EntityType,
-                               ManagerType, ReportStatus)
+                               ManagerType)
 
 
 @dataclass
