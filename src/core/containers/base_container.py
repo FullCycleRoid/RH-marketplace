@@ -29,9 +29,7 @@ class BaseContainer(containers.DeclarativeContainer):
         autocommit=False,
     )
 
-    async_session = providers.Resource(
-        async_session_factory
-    )
+    async_session = providers.Resource(async_session_factory)
 
     # Redis пул соединений
     redis_pool = providers.Singleton(
@@ -47,7 +45,4 @@ class BaseContainer(containers.DeclarativeContainer):
         connection_pool=redis_pool,
     )
 
-    redis_repo = providers.Singleton(
-        RedisRepository,
-        client=redis_client
-    )
+    redis_repo = providers.Singleton(RedisRepository, client=redis_client)

@@ -1,12 +1,14 @@
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
+from pipelines.company_loader.dto import (Contact, FinancialReport, Manager,
+                                          TaxReport)
 from pipelines.raw_model import RawCompany
-from pipelines.company_loader.dto import Contact, FinancialReport, Manager, TaxReport
 from src.company.enums import LegalStatus, SystemStatus
-from src.company.infrastructure.models import Company, CompanyField, CompanyFieldType
+from src.company.infrastructure.models import (Company, CompanyField,
+                                               CompanyFieldType)
 
 
 @dataclass

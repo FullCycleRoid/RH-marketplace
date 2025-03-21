@@ -5,7 +5,8 @@ from typing import Dict, List
 
 from pipelines.company_loader.context import CompanyContext
 from pipelines.company_loader.steps.add_director_step import AddDirectorStep
-from pipelines.company_loader.steps.build_company_db_model import BuildCompanyDBModel
+from pipelines.company_loader.steps.build_company_db_model import \
+    BuildCompanyDBModel
 from pipelines.company_loader.steps.convert_registration_date import \
     ConvertRegistrationDateStep
 from pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep

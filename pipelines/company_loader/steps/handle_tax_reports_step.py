@@ -1,6 +1,6 @@
+from pipelines.company_loader.dto import TaxReport
 from pipelines.generic_pipeline import Context, NextStep
 from pipelines.utils import convert_to_numeric
-from pipelines.company_loader.dto import TaxReport
 
 
 class HandleTaxReportStep:

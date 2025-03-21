@@ -12,7 +12,9 @@ class AuthContainer(containers.DeclarativeContainer):
     parent = providers.DependenciesContainer()
 
     # Репозитории
-    user_repo = providers.Factory(SQLAlchemyUsersRepository, session=parent.async_session)
+    user_repo = providers.Factory(
+        SQLAlchemyUsersRepository, session=parent.async_session
+    )
 
     refresh_repo = providers.Factory(
         SQLAlchemyRefreshTokensRepository, session=parent.async_session

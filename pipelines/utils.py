@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from pipelines.connector import ClusterDBSession, MarketplaceDBSession
 from pipelines.raw_model import RawCompany
-from src import OkvedNode, CompanyFieldType
+from src import CompanyFieldType, OkvedNode
 from src.core.logger import logger
 
 

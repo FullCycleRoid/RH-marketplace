@@ -1,5 +1,5 @@
-from fastapi import Depends, Response, status
 from dependency_injector import inject
+from fastapi import Depends, Response, status
 
 from src.auth.application.managers.auth_manager import AuthManager
 from src.auth.application.services.depends_scratch import create_refresh_token
@@ -16,7 +16,7 @@ from src.auth.security.tokens import create_access_token
 async def login(
     response: Response,
     auth_data: LoginUserScheme,
-    manager: AuthManager = Depends(get_auth_manager)
+    manager: AuthManager = Depends(get_auth_manager),
 ):
     user = await manager.login_user(auth_data)
 

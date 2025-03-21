@@ -1,6 +1,8 @@
 from typing import Annotated
-from fastapi import Depends, HTTPException, status
+
 from dependency_injector.wiring import Provide, inject
+from fastapi import Depends, HTTPException, status
+
 from src.auth.application.managers.auth_manager import AuthManager
 from src.auth.application.services.auth_servcies import AuthService
 from src.auth.application.services.user_services import UserService
@@ -40,6 +42,7 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
         )
+
 
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 

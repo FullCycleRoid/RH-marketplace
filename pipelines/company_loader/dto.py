@@ -3,8 +3,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from src.company.enums import (AddressType, ContactType, EntityType,
-                               ManagerType)
+from src.company.enums import AddressType, ContactType, EntityType, ManagerType
 
 
 @dataclass
