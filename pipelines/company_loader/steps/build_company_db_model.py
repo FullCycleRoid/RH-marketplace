@@ -1,8 +1,8 @@
-from typing import List
+from typing import Dict
 
 from pipelines.company_loader.context import CompanyDTO
 from pipelines.generic_pipeline import Context, NextStep
-from src import Company, CompanyField
+from src import Company
 from src.core.logger import logger
 
 
@@ -10,7 +10,8 @@ class BuildCompanyDBModel:
     def __call__(self, context: Context, next_step: NextStep) -> None:
 
         ctx_company: CompanyDTO = context.company_dto
-        field_types: List[CompanyField] = context.field_types
+        field_type_ids: Dict[str, int] = context.field_type_ids
+
 
         company = Company(
             country_code=ctx_company.country_code,

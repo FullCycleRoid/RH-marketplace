@@ -1,6 +1,7 @@
 import multiprocessing
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from typing import Dict, List
 
 from pipelines.company_loader.context import CompanyContext
 from pipelines.company_loader.steps.add_director_step import AddDirectorStep
@@ -27,16 +28,17 @@ from pipelines.company_loader.steps.match_legal_status_step import \
 from pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
 from pipelines.generic_pipeline import Context, Pipeline, error_handler
 from pipelines.utils import get_active_companies, get_all_field_types
+from src import CompanyFieldType
 
 BATCH_SIZE = 100
 MAX_COMPANIES = 20_000_000
 
 
-def process_single_company(company, field_types, process_pipeline, error_handler):
+def process_single_company(company, field_type_ids, process_pipeline, error_handler):
     """Обработка одной компании"""
     company_ctx = CompanyContext()
     company_ctx.raw_company = company
-    company_ctx.field_types = field_types
+    company_ctx.field_type_ids = field_type_ids
     process_pipeline(company_ctx, error_handler)
 
 def process_batch_sequential(batch, process_pipeline, error_handler):
@@ -58,7 +60,7 @@ def process_batch_threaded(batch, process_pipeline, error_handler):
         for future in futures:
             future.result()  # Ожидаем завершения всех задач
 
-def process_batch_multiprocess(batch, field_types, process_pipeline, error_handler):
+def process_batch_multiprocess(batch, field_type_ids, process_pipeline, error_handler):
     """Многопроцессная обработка батча"""
     ctx = multiprocessing.get_context("spawn")
 
@@ -67,7 +69,7 @@ def process_batch_multiprocess(batch, field_types, process_pipeline, error_handl
             executor.submit(
                 process_single_company,
                 company,
-                field_types,
+                field_type_ids,
                 process_pipeline,
                 error_handler
             ) for company in batch
@@ -75,12 +77,44 @@ def process_batch_multiprocess(batch, field_types, process_pipeline, error_handl
         for future in futures:
             future.result()
 
+def match_field_type_names() -> Dict:
+    field_match = dict()
+    field_names = [
+        'name',
+        'legal_name',
+        'inn',
+        'registration_date',
+        'liquidation_date',
+        'legal_address',
+        'ogrn',
+        'kpp',
+        'okpo',
+        'authorized_capital',
+        'average_number_of_employees',
+        'advantages',
+        'okogu_code',
+        'okopf_code',
+        'okfs_code',
+        'okato_code',
+        'oktmo_code',
+        'kladr_code',
+    ]
+    field_types: List[CompanyFieldType] = get_all_field_types()
+
+    for name in field_names:
+        for type in field_types:
+            if name == type.en_name:
+                field_match[name] = type.id
+
+    return field_match
+
+
+
 def start_process(translator = None):
     start_process_time = time.perf_counter()
-
     offset = 0
 
-    field_types = get_all_field_types()
+    field_type_ids = match_field_type_names()
 
     process_pipeline = Pipeline[Context](
         CreateCompanyDTOStep(translator),
@@ -105,7 +139,7 @@ def start_process(translator = None):
             break
 
         start_batch_time = time.perf_counter()
-        process_batch_multiprocess(batch, field_types, process_pipeline, error_handler)
+        process_batch_multiprocess(batch, field_type_ids, process_pipeline, error_handler)
         process_batch_time = time.perf_counter() - start_batch_time
         process_time = time.perf_counter() - start_process_time
 

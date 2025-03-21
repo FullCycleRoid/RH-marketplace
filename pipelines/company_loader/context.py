@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from pipelines.raw_model import RawCompany
 from pipelines.company_loader.dto import Contact, FinancialReport, Manager, TaxReport
@@ -52,7 +52,7 @@ class CompanyDTO:
 
 @dataclass
 class CompanyContext:
-    field_types: List[CompanyFieldType]
+    field_type_ids: Dict[str, int]
     raw_company: Optional[RawCompany] = None
     company_dto: Optional[CompanyDTO] = None
     company_model: Optional[Company] = None
