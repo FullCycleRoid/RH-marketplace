@@ -115,12 +115,14 @@ class Company(Base):
     def add_tax_report(
         self,
         year: str,
-        data: str,
+        taxes_paid: str,
+        paid_insurance: str,
     ):
         report = TaxReport(
             company_id=self.id,
             year=year,
-            data=data,
+            taxes_paid=taxes_paid,
+            paid_insurance=paid_insurance,
         )
         self.tax_reports.append(report)
         return report
@@ -145,7 +147,6 @@ class Company(Base):
     def update_system_status(self, new_status: SystemStatus):
         """Обновляет системный статус компании"""
         self.system_status = new_status
-        self.updated_at = func.now()
         return self
 
     def log_change(
@@ -282,7 +283,8 @@ class TaxReport(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
     year = Column(Integer, nullable=False)
-    data = Column(Text)
+    taxes_paid = Column(Text, nullable=True)
+    paid_insurance = Column(Text, nullable=True)
 
     company = relationship("Company", back_populates="tax_reports")
 
