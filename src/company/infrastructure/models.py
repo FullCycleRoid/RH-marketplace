@@ -86,7 +86,6 @@ class Company(Base):
         inn: str = None,
         since_on_position: datetime = None,
     ):
-        """Добавляет менеджера компании"""
         manager = Manager(
             company_id=self.id,
             position=position,
@@ -97,6 +96,51 @@ class Company(Base):
         )
         self.managers.append(manager)
         return manager
+
+    def add_contact(
+        self,
+        type: ContactType,
+        data: str,
+        is_verified: bool,
+    ):
+        contact = Contact(
+            company_id=self.id,
+            type=type,
+            data=data,
+            is_verified=is_verified,
+        )
+        self.contacts.append(contact)
+        return contact
+
+    def add_tax_report(
+        self,
+        year: str,
+        data: str,
+    ):
+        report = TaxReport(
+            company_id=self.id,
+            year=year,
+            data=data,
+        )
+        self.tax_reports.append(report)
+        return report
+
+    def add_financial_report(
+        self,
+        year: str,
+        currency: str,
+        annual_income: str,
+        net_profit: str = None,
+    ):
+        report = FinancialReport(
+            company_id=self.id,
+            year=year,
+            currency=currency,
+            annual_income=annual_income,
+            net_profit=net_profit,
+        )
+        self.financial_reports.append(report)
+        return report
 
     def update_system_status(self, new_status: SystemStatus):
         """Обновляет системный статус компании"""
@@ -226,11 +270,9 @@ class FinancialReport(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
     year = Column(Integer, nullable=False)
-    annual_income = Column(DECIMAL(20, 2), nullable=False)
-    net_profit = Column(DECIMAL(20, 2), nullable=False)
+    annual_income = Column(DECIMAL(20, 2), nullable=True)
+    net_profit = Column(DECIMAL(20, 2), nullable=True)
     currency = Column(String(3), nullable=False)
-    status = Column(Enum(ReportStatus, name="report_status"), nullable=False)
-    audited_by = Column(Integer, ForeignKey("users.id"))
 
     company = relationship("Company", back_populates="financial_reports")
 
@@ -240,10 +282,7 @@ class TaxReport(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
     year = Column(Integer, nullable=False)
-    quarter = Column(Integer, nullable=False)
-    period_start = Column(DateTime(timezone=True), nullable=False)
-    period_end = Column(DateTime(timezone=True), nullable=False)
-    status = Column(Enum(ReportStatus, name="report_status"), nullable=False)
+    data = Column(Text)
 
     company = relationship("Company", back_populates="tax_reports")
 
