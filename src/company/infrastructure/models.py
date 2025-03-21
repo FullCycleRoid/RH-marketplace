@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import uuid4
 
 from sqlalchemy import (DECIMAL, Boolean, Column, DateTime, Enum, ForeignKey,
@@ -58,9 +59,11 @@ class Company(Base):
     def add_field(
         self,
         company_field_type_id: UUID,
-        ru_data: str = None,
-        en_data: str = None,
+        ru_data: Optional[str] = None,
+        en_data: Optional[str] = None,
         json_data: dict = None,
+        datetime_data: Optional[datetime] = None,
+        translation_config: Optional[dict] = None,
     ):
         """Добавляет новое поле компании"""
         field = CompanyField(
@@ -69,6 +72,8 @@ class Company(Base):
             ru_data=ru_data,
             en_data=en_data,
             json_data=json_data,
+            datetime_data=datetime_data,
+            translation_config=translation_config
         )
         self.fields.append(field)
         return field
@@ -167,10 +172,11 @@ class CompanyField(Base):
         UUID(as_uuid=True), ForeignKey("company_field_type.id"), nullable=False
     )
 
-    ru_data = Column(Text, nullable=True)
     en_data = Column(Text, nullable=True)
+    ru_data = Column(Text, nullable=True)
 
     json_data = Column(JSONB, nullable=True)
+    datetime_data = Column(DateTime(timezone=True), nullable=True)
 
     translation_config = Column(JSONB, nullable=True)
 
@@ -208,7 +214,7 @@ class Contact(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
     type = Column(Enum(ContactType, name="contact_type"), nullable=False)
-    value = Column(Text, nullable=False)
+    data = Column(Text, nullable=False)
 
     is_verified = Column(Boolean, nullable=False, default=False)
 

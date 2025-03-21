@@ -1,3 +1,4 @@
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import List, Optional, Dict
@@ -52,7 +53,7 @@ class CompanyDTO:
 
 @dataclass
 class CompanyContext:
-    field_type_ids: Dict[str, int]
+    field_type_ids: Dict[str, uuid]
     raw_company: Optional[RawCompany] = None
     company_dto: Optional[CompanyDTO] = None
     company_model: Optional[Company] = None
