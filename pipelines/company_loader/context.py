@@ -5,7 +5,7 @@ from typing import List, Optional
 from pipelines.raw_model import RawCompany
 from pipelines.company_loader.dto import Contact, FinancialReport, Manager, TaxReport
 from src.company.enums import LegalStatus, SystemStatus
-from src.company.infrastructure.models import Company
+from src.company.infrastructure.models import Company, CompanyField, CompanyFieldType
 
 
 @dataclass
@@ -52,6 +52,7 @@ class CompanyDTO:
 
 @dataclass
 class CompanyContext:
+    field_types: List[CompanyFieldType]
     raw_company: Optional[RawCompany] = None
     company_dto: Optional[CompanyDTO] = None
     company_model: Optional[Company] = None

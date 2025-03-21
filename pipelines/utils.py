@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from pipelines.connector import ClusterDBSession, MarketplaceDBSession
 from pipelines.raw_model import RawCompany
-from src import OkvedNode
+from src import OkvedNode, CompanyFieldType
 from src.core.logger import logger
 
 
@@ -116,4 +116,12 @@ def get_okved_by_code(code: str, _session: Session = MarketplaceDBSession) -> Op
         res = session.query(OkvedNode).filter(OkvedNode.code == code).first()
         if res is None:
             print("Код не найден в базе данных")
+        return res
+
+
+def get_all_field_types(_session: Session = MarketplaceDBSession) -> Optional[CompanyFieldType]:
+    with _session() as session:
+        res = session.query(CompanyFieldType).all()
+        if res is None:
+            print("Типы полей не найдены в базе данных")
         return res

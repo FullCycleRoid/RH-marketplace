@@ -4,6 +4,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
 from pipelines.company_loader.context import CompanyContext
 from pipelines.company_loader.steps.add_director_step import AddDirectorStep
+from pipelines.company_loader.steps.build_company_db_model import BuildCompanyDBModel
 from pipelines.company_loader.steps.convert_registration_date import \
     ConvertRegistrationDateStep
 from pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep
@@ -25,17 +26,17 @@ from pipelines.company_loader.steps.match_legal_status_step import \
     MatchLegalStateStep
 from pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
 from pipelines.generic_pipeline import Context, Pipeline, error_handler
-from pipelines.utils import get_active_companies
-
+from pipelines.utils import get_active_companies, get_all_field_types
 
 BATCH_SIZE = 100
 MAX_COMPANIES = 20_000_000
 
 
-def process_single_company(company, process_pipeline, error_handler):
+def process_single_company(company, field_types, process_pipeline, error_handler):
     """Обработка одной компании"""
     company_ctx = CompanyContext()
     company_ctx.raw_company = company
+    company_ctx.field_types = field_types
     process_pipeline(company_ctx, error_handler)
 
 def process_batch_sequential(batch, process_pipeline, error_handler):
@@ -57,7 +58,7 @@ def process_batch_threaded(batch, process_pipeline, error_handler):
         for future in futures:
             future.result()  # Ожидаем завершения всех задач
 
-def process_batch_multiprocess(batch, process_pipeline, error_handler):
+def process_batch_multiprocess(batch, field_types, process_pipeline, error_handler):
     """Многопроцессная обработка батча"""
     ctx = multiprocessing.get_context("spawn")
 
@@ -66,6 +67,7 @@ def process_batch_multiprocess(batch, process_pipeline, error_handler):
             executor.submit(
                 process_single_company,
                 company,
+                field_types,
                 process_pipeline,
                 error_handler
             ) for company in batch
@@ -74,7 +76,11 @@ def process_batch_multiprocess(batch, process_pipeline, error_handler):
             future.result()
 
 def start_process(translator = None):
+    start_process_time = time.perf_counter()
+
     offset = 0
+
+    field_types = get_all_field_types()
 
     process_pipeline = Pipeline[Context](
         CreateCompanyDTOStep(translator),
@@ -94,16 +100,19 @@ def start_process(translator = None):
 
     while offset < MAX_COMPANIES:
         batch = get_active_companies(offset, BATCH_SIZE)
+
         if not batch:
             break
 
-        start = time.perf_counter()
-        process_batch_multiprocess(batch, process_pipeline, error_handler)
-        process_time = time.perf_counter() - start
+        start_batch_time = time.perf_counter()
+        process_batch_multiprocess(batch, field_types, process_pipeline, error_handler)
+        process_batch_time = time.perf_counter() - start_batch_time
+        process_time = time.perf_counter() - start_process_time
 
         offset += BATCH_SIZE
         print(f"Обрабатано {offset} компаний. ")
-        print(f"{BATCH_SIZE} компаний обработано за {process_time:.2f} сек")
+        print(f"{BATCH_SIZE} компаний обработано за {process_batch_time:.2f} сек")
+        print(f"Всего {offset} компаний обработано за {process_time:.2f} сек")
 
 if __name__ == '__main__':
     start_process()
