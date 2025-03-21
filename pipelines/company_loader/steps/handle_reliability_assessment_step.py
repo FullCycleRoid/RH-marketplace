@@ -11,21 +11,21 @@ class HandleReliabilityAssessmentStep:
         en_assessments = []
 
         r_assessment = context.raw_company.reliability_assessment
-        if "Реквизиты,ОГРН,ИНН,КПП" not in r_assessment:
-            if context.raw_company.reliability_assessment:
-                for assessment in r_assessment[2:-2].split('","'):
-                    ru_assessments.append(assessment)
+        if context.raw_company.reliability_assessment and "Реквизиты,ОГРН,ИНН,КПП" not in r_assessment:
+            for assessment in r_assessment[2:-2].split('","'):
+                ru_assessments.append(assessment)
 
-                    if assessment in context.translated_advantages:
-                        en_assessment = context.translated_advantages[assessment]
-                    else:
-                        en_assessment = translate_large_text(assessment)
-                        context.translated_advantages[assessment] = en_assessment
+                if assessment in context.translated_advantages:
+                    en_assessment = context.translated_advantages[assessment]
+                else:
+                    en_assessment = translate_large_text(assessment)
+                    context.translated_advantages[assessment] = en_assessment
 
-                    en_assessments.append(en_assessment)
+                en_assessments.append(en_assessment)
 
-                context.company_dto.advantages.extend(ru_assessments)
-                context.company_dto.en_advantages.extend(en_assessments)
+            context.company_dto.advantages.extend(ru_assessments)
+            context.company_dto.en_advantages.extend(en_assessments)
+
             print("***********   ReliabilityAssessment   ***********")
             print(context.company_dto.advantages)
             print(context.company_dto.en_advantages,)

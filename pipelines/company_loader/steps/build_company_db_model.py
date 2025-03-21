@@ -8,7 +8,6 @@ from pipelines.connector import MarketplaceDBSession
 from pipelines.generic_pipeline import Context, NextStep
 from src import Company
 from src.company.enums import TranslationType
-from src.core.logger import logger
 
 
 class BuildCompanyDBModel:
