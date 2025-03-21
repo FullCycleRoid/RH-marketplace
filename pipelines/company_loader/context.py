@@ -60,4 +60,6 @@ class CompanyContext:
     company_dto: Optional[CompanyDTO] = None
     company_model: Optional[Company] = None
 
+    translated_advantages: Dict[str, str] = field(default_factory=dict)
+
     failed_records = 0

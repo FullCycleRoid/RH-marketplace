@@ -12,8 +12,6 @@ class HandleAdvantagesStep:
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
         advantages = context.raw_company.advantages
-        seen = dict()
-        en_advantages = []
 
         if advantages:
             fixed_json_string = '[' + context.raw_company.advantages.strip('{}') + ']'
@@ -22,13 +20,15 @@ class HandleAdvantagesStep:
                 ru_advantages: List[str] = json.loads(fixed_json_string)
                 ru_advantages = [item.split(": ")[1] for item in ru_advantages]
 
-                for adv in ru_advantages:
-                    if adv in seen:
-                        en_adv = seen[adv]
+                en_advantages = []
 
-                    if adv not in seen:
+                for adv in ru_advantages:
+                    if adv in context.translated_advantages:
+                        en_adv = context.translated_advantages[adv]
+
+                    if adv not in context.translated_advantages:
                         en_adv = translate_large_text(adv)
-                        seen[adv] = en_adv
+                        context.translated_advantages[adv] = en_adv
                     en_advantages.append(en_adv)
 
                 print('*********** ADVANTAGES *************')

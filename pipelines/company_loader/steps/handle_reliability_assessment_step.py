@@ -15,7 +15,14 @@ class HandleReliabilityAssessmentStep:
             if context.raw_company.reliability_assessment:
                 for assessment in r_assessment[2:-2].split('","'):
                     ru_assessments.append(assessment)
-                    en_assessments.append(translate_large_text(assessment))
+
+                    if assessment in context.translated_advantages:
+                        en_assessment = context.translated_advantages[assessment]
+                    else:
+                        en_assessment = translate_large_text(assessment)
+                        context.translated_advantages[assessment] = en_assessment
+
+                    en_assessments.append(en_assessment)
 
                 context.company_dto.advantages.extend(ru_assessments)
                 context.company_dto.en_advantages.extend(en_assessments)
