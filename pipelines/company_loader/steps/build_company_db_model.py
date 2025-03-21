@@ -154,6 +154,18 @@ class BuildCompanyDBModel:
                         en_data=ctx_company.average_number_of_employees,
                         translation_config=translation_config
                     )
+
+                if name == 'advantages':
+                    ru_advantages = ', '.join(ctx_company.advantages)
+                    en_advantages = ', '.join(ctx_company.en_advantages)
+                    company.add_field(
+                        company_field_type_id=type_id,
+                        ru_data=ru_advantages,
+                        en_data=en_advantages,
+                        translation_config=translation_config
+                    )
+
+
             for contact in ctx_company.contacts:
                 company.add_contact(
                     type=contact.type,
