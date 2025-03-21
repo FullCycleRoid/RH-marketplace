@@ -165,7 +165,6 @@ class BuildCompanyDBModel:
                         translation_config=translation_config
                     )
 
-
             for contact in ctx_company.contacts:
                 company.add_contact(
                     type=contact.type,
