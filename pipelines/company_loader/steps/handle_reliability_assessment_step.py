@@ -1,5 +1,5 @@
 from pipelines.generic_pipeline import Context, NextStep
-from src.core.language_translator.google_translator import translate_large_text
+from src.core.language_translator.proxy_google_translator2 import translate, proxy_settings
 
 
 class HandleReliabilityAssessmentStep:
@@ -18,7 +18,7 @@ class HandleReliabilityAssessmentStep:
                 if assessment in context.translated_advantages:
                     en_assessment = context.translated_advantages[assessment]
                 else:
-                    en_assessment = translate_large_text(assessment)
+                    en_assessment = translate(assessment, proxies=proxy_settings)
                     context.translated_advantages[assessment] = en_assessment
 
                 en_assessments.append(en_assessment)

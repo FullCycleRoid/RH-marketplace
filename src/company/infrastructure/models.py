@@ -8,8 +8,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
 from src.company.enums import (ContactType, DataType, EntityType, FieldType,
-                               LegalStatus, ManagerType, ReportStatus,
-                               SystemStatus, ValidationType)
+                               LegalStatus, ManagerType, SystemStatus, ValidationType, TranslationMode)
 from src.core.database.declarative_base import Base
 
 
@@ -62,13 +61,13 @@ class Company(Base):
     def add_field(
         self,
         company_field_type_id: UUID,
+        is_translatable: bool,
         ru_data: Optional[str] = None,
         en_data: Optional[str] = None,
         json_data: dict = None,
         datetime_data: Optional[datetime] = None,
-        translation_config: Optional[dict] = None,
+        translation_mode: Optional[TranslationMode] = None
     ):
-        """Добавляет новое поле компании"""
         field = CompanyField(
             company_id=self.id,
             company_field_type_id=company_field_type_id,
@@ -76,7 +75,8 @@ class Company(Base):
             en_data=en_data,
             json_data=json_data,
             datetime_data=datetime_data,
-            translation_config=translation_config,
+            is_translatable=is_translatable,
+            translation_mode=translation_mode,
         )
         self.fields.append(field)
         return field
@@ -226,7 +226,8 @@ class CompanyField(Base):
     json_data = Column(JSONB, nullable=True)
     datetime_data = Column(DateTime(timezone=True), nullable=True)
 
-    translation_config = Column(JSONB, nullable=True)
+    is_translatable = Column(Boolean, nullable=False, default=False)
+    translation_mode = Column(Enum(TranslationMode, name='translation_mode'), nullable=True, default=None)
 
     field_type = relationship("CompanyFieldType", back_populates="fields")
     company = relationship("Company", back_populates="fields")

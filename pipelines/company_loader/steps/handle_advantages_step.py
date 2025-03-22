@@ -2,7 +2,7 @@ import json
 from typing import List
 
 from pipelines.generic_pipeline import Context, NextStep
-from src.core.language_translator.google_translator import translate_large_text
+from src.core.language_translator.proxy_google_translator2 import translate, proxy_settings
 
 
 class HandleAdvantagesStep:
@@ -27,8 +27,9 @@ class HandleAdvantagesStep:
                         en_adv = context.translated_advantages[adv]
 
                     if adv not in context.translated_advantages:
-                        en_adv = translate_large_text(adv)
+                        en_adv = translate(adv, proxies=proxy_settings)
                         context.translated_advantages[adv] = en_adv
+
                     en_advantages.append(en_adv)
 
                 print('*********** ADVANTAGES *************')

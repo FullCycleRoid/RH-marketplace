@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from src import Base
+from src.core.database.declarative_base import Base
 
 
 class OkvedNode(Base):

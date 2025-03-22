@@ -2,7 +2,7 @@ from pipelines.company_loader.dto import Manager
 from pipelines.generic_pipeline import Context, NextStep
 from pipelines.utils import convert_ru_date_to_date_obj
 from src.company.enums import ManagerType
-from src.core.language_translator.google_translator import translate_large_text
+from src.core.language_translator.proxy_google_translator2 import translate, proxy_settings
 
 
 class AddDirectorStep:
@@ -22,8 +22,7 @@ class AddDirectorStep:
             CEO = Manager(
                     position=ManagerType.CEO,
                     full_name=director_name,
-                    # en_full_name=self.translator(director_name),
-                    en_full_name=translate_large_text(director_name),
+                    en_full_name=translate(director_name, proxies=proxy_settings),
                     since_on_position=since_on_position
                 )
 

@@ -31,15 +31,14 @@ from pipelines.generic_pipeline import Context, Pipeline, error_handler
 from pipelines.utils import get_active_companies, get_all_field_types
 from src import CompanyFieldType
 
-BATCH_SIZE = 100
+BATCH_SIZE = 500
 MAX_COMPANIES = 20_000_000
 
 
 def process_single_company(company, field_type_ids, process_pipeline, error_handler):
     """Обработка одной компании"""
-    company_ctx = CompanyContext()
+    company_ctx = CompanyContext(field_type_ids=field_type_ids)
     company_ctx.raw_company = company
-    company_ctx.field_type_ids = field_type_ids
     process_pipeline(company_ctx, error_handler)
 
 def process_batch_sequential(batch, process_pipeline, error_handler):
@@ -109,6 +108,9 @@ def match_field_type_names() -> Dict:
 
     return field_match
 
+def load_proxies(file_path: str) -> List[str]:
+    with open(file_path, 'r') as f:
+        return f.readlines()
 
 
 def start_process(translator = None):
@@ -116,6 +118,8 @@ def start_process(translator = None):
     offset = 0
 
     field_type_ids = match_field_type_names()
+    PROXIES = load_proxies('../../../proxylist.txt')
+    print(PROXIES)
 
     process_pipeline = Pipeline[Context](
         CreateCompanyDTOStep(translator),
@@ -130,7 +134,7 @@ def start_process(translator = None):
         HandleReliabilityAssessmentStep(translator),
         HandleAdvantagesStep(translator),
         OkvedM2MIdsStep(),
-        BuildCompanyDBModel(),
+        # BuildCompanyDBModel(),
     )
 
     while offset < MAX_COMPANIES:
