@@ -1,9 +1,9 @@
 from pipelines.company_loader.dto import FinancialReport
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import convert_to_numeric
 
 
-class HandleFinancialReportStep:
+class HandleFinancialReportStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         annual_income = convert_to_numeric(context.raw_company.annual_income)
         net_profit = convert_to_numeric(context.raw_company.net_profit)

@@ -5,13 +5,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from pipelines.company_loader.context import CompanyDTO
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import get_company_by_inn
-from src import Company, CompanyOKVED, Contact, FinancialReport, Manager, TaxReport
+from src import (Company, CompanyOKVED, Contact, FinancialReport, Manager,
+                 TaxReport)
 from src.company.enums import TranslationMode
 
 
-class BuildCompanyDBModel:
+class BuildCompanyDBModel(PipelineStep):
     _sessionmaker = None
 
     def __call__(self, context: Context, next_step: NextStep) -> None:

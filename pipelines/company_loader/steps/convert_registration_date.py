@@ -1,9 +1,9 @@
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import convert_ru_date_to_date_obj
 from src.core.logger import logger
 
 
-class ConvertRegistrationDateStep:
+class ConvertRegistrationDateStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         registration_date = context.raw_company.registration_date
 

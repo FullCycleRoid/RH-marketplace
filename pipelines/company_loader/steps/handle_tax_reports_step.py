@@ -1,9 +1,9 @@
 from pipelines.company_loader.dto import TaxReport
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import convert_to_numeric
 
 
-class HandleTaxReportStep:
+class HandleTaxReportStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         taxes_paid = context.raw_company.taxes_paid
         paid_insurance = context.raw_company.paid_insurance

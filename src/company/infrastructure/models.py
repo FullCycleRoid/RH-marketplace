@@ -2,34 +2,14 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
-from sqlalchemy import (
-    DECIMAL,
-    Boolean,
-    Column,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Index,
-    Integer,
-    String,
-    Text,
-    UniqueConstraint,
-    func,
-)
+from sqlalchemy import (DECIMAL, Boolean, Column, DateTime, Enum, ForeignKey,
+                        Index, Integer, String, Text, UniqueConstraint, func)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
-from src.company.enums import (
-    ContactType,
-    DataType,
-    EntityType,
-    FieldType,
-    LegalStatus,
-    ManagerType,
-    SystemStatus,
-    TranslationMode,
-    ValidationType,
-)
+from src.company.enums import (ContactType, DataType, EntityType, FieldType,
+                               LegalStatus, ManagerType, SystemStatus,
+                               TranslationMode, ValidationType)
 from src.core.database.declarative_base import Base
 
 

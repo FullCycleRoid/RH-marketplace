@@ -1,14 +1,12 @@
 from pipelines.company_loader.dto import Manager
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import convert_ru_date_to_date_obj, get_random_proxy_obj
 from src.company.enums import ManagerType
 from src.core.language_translator.proxy_google_translator2 import (
-    translate,
-    translate_large_text,
-)
+    translate, translate_large_text)
 
 
-class AddDirectorStep:
+class AddDirectorStep(PipelineStep):
     def __init__(self, translator=None):
         self.translator = translator
 

@@ -1,9 +1,9 @@
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import convert_ru_date_to_date_obj
 from src.company.enums import LegalStatus
 
 
-class MatchLegalStateStep:
+class MatchLegalStateStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         legal_entity_state = context.raw_company.legal_entity_state
 

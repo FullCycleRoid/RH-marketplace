@@ -3,16 +3,12 @@ from typing import Optional
 from uuid import UUID
 
 from src.auth.application.services.auth_servcies import AuthService
-from src.auth.application.services.user_services import RedisUserService, UserService
+from src.auth.application.services.user_services import (RedisUserService,
+                                                         UserService)
 from src.auth.config import auth_config
-from src.auth.exceptions import (
-    EmailAlreadyConfirmed,
-    EmailNotConfirmed,
-    EmailTaken,
-    InvalidCredentials,
-    PhoneTaken,
-    UserNotFound,
-)
+from src.auth.exceptions import (EmailAlreadyConfirmed, EmailNotConfirmed,
+                                 EmailTaken, InvalidCredentials, PhoneTaken,
+                                 UserNotFound)
 from src.auth.infrastructure.models import RefreshToken, User
 from src.auth.presentation.schemas import LoginUserScheme, RegisterUserScheme
 from src.auth.security.password import check_password, hash_password

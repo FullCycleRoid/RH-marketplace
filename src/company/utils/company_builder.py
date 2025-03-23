@@ -3,13 +3,8 @@ from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
-from src.company.enums import (
-    ContactType,
-    FieldType,
-    LegalStatus,
-    ManagerType,
-    SystemStatus,
-)
+from src.company.enums import (ContactType, FieldType, LegalStatus,
+                               ManagerType, SystemStatus)
 from src.company.infrastructure.models import Company, Manager
 
 

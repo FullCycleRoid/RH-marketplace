@@ -1,10 +1,10 @@
 import re
 
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from src.core.logger import logger
 
 
-class ConvertAuthorizedCapitalStep:
+class ConvertAuthorizedCapitalStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         raw_data = context.raw_company.authorized_capital
 

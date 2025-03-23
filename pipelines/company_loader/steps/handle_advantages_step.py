@@ -1,12 +1,13 @@
 import json
 from typing import List
 
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import get_random_proxy_obj
-from src.core.language_translator.proxy_google_translator2 import translate_large_text
+from src.core.language_translator.proxy_google_translator2 import \
+    translate_large_text
 
 
-class HandleAdvantagesStep:
+class HandleAdvantagesStep(PipelineStep):
     def __init__(self, translator=None):
         self.translator = translator
 

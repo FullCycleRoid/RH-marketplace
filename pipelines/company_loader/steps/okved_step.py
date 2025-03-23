@@ -3,11 +3,11 @@ from pprint import pprint
 from sqlalchemy.exc import DatabaseError
 
 from pipelines.company_loader.okved_mapper import OkvedMapper
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import get_okved_by_code
 
 
-class OkvedM2MIdsStep:
+class OkvedM2MIdsStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         okved_ids = []
         mapper = OkvedMapper("../okved.csv")

@@ -1,9 +1,9 @@
 from pipelines.company_loader.dto import Contact
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from src.company.enums import ContactType
 
 
-class HandleContactsStep:
+class HandleContactsStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         raw_contacts = context.raw_company.contacts
         if raw_contacts:

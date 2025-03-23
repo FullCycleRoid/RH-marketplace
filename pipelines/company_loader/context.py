@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from pipelines.company_loader.dto import Contact, FinancialReport, Manager, TaxReport
+from pipelines.company_loader.dto import (Contact, FinancialReport, Manager,
+                                          TaxReport)
 from pipelines.raw_model import RawCompany
 from src.company.enums import LegalStatus, SystemStatus
 from src.company.infrastructure.models import Company

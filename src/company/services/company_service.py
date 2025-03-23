@@ -2,18 +2,10 @@ import re
 from typing import List
 from uuid import UUID
 
-from src import (
-    Company,
-    CompanyField,
-    CompanyFieldType,
-    LegalStatus,
-    SystemStatus,
-    ValidationType,
-)
+from src import (Company, CompanyField, CompanyFieldType, LegalStatus,
+                 SystemStatus, ValidationType)
 from src.company.infrastructure.repositories.postgres import (
-    CompanyPostgresRepository,
-    FieldTypePostgresRepository,
-)
+    CompanyPostgresRepository, FieldTypePostgresRepository)
 
 
 class CompanyService:

@@ -5,27 +5,27 @@ from typing import Dict, List
 
 from pipelines.company_loader.context import CompanyContext
 from pipelines.company_loader.steps.add_director_step import AddDirectorStep
-from pipelines.company_loader.steps.build_company_db_model import BuildCompanyDBModel
-from pipelines.company_loader.steps.convert_registration_date import (
-    ConvertRegistrationDateStep,
-)
+from pipelines.company_loader.steps.build_company_db_model import \
+    BuildCompanyDBModel
+from pipelines.company_loader.steps.convert_registration_date import \
+    ConvertRegistrationDateStep
 from pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep
-from pipelines.company_loader.steps.handle_advantages_step import HandleAdvantagesStep
-from pipelines.company_loader.steps.handle_authorized_capital import (
-    ConvertAuthorizedCapitalStep,
-)
-from pipelines.company_loader.steps.handle_average_number_of_employees import (
-    ConvertAverageNumberOfEmployeesStep,
-)
-from pipelines.company_loader.steps.handle_contacts_step import HandleContactsStep
-from pipelines.company_loader.steps.handle_financial_reports_step import (
-    HandleFinancialReportStep,
-)
-from pipelines.company_loader.steps.handle_reliability_assessment_step import (
-    HandleReliabilityAssessmentStep,
-)
-from pipelines.company_loader.steps.handle_tax_reports_step import HandleTaxReportStep
-from pipelines.company_loader.steps.match_legal_status_step import MatchLegalStateStep
+from pipelines.company_loader.steps.handle_advantages_step import \
+    HandleAdvantagesStep
+from pipelines.company_loader.steps.handle_authorized_capital import \
+    ConvertAuthorizedCapitalStep
+from pipelines.company_loader.steps.handle_average_number_of_employees import \
+    ConvertAverageNumberOfEmployeesStep
+from pipelines.company_loader.steps.handle_contacts_step import \
+    HandleContactsStep
+from pipelines.company_loader.steps.handle_financial_reports_step import \
+    HandleFinancialReportStep
+from pipelines.company_loader.steps.handle_reliability_assessment_step import \
+    HandleReliabilityAssessmentStep
+from pipelines.company_loader.steps.handle_tax_reports_step import \
+    HandleTaxReportStep
+from pipelines.company_loader.steps.match_legal_status_step import \
+    MatchLegalStateStep
 from pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
 from pipelines.generic_pipeline import Context, Pipeline, error_handler
 from pipelines.utils import get_active_companies, get_all_field_types

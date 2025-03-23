@@ -1,7 +1,7 @@
-from pipelines.generic_pipeline import Context, NextStep
+from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 
 
-class ConvertAverageNumberOfEmployeesStep:
+class ConvertAverageNumberOfEmployeesStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
         raw_data = context.raw_company.average_number_of_employees
         if raw_data:
