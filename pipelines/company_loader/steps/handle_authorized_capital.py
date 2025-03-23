@@ -9,7 +9,7 @@ class ConvertAuthorizedCapitalStep:
         raw_data = context.raw_company.authorized_capital
 
         if raw_data:
-            clean_data = int("".join(re.findall(r'\d', raw_data)))
+            clean_data = int("".join(re.findall(r"\d", raw_data)))
             if not clean_data:
                 logger.info("Authorized capital is None")
             else:

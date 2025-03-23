@@ -1,8 +1,17 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import (Callable, Generator, Generic, Iterable, List, Optional,
-                    Protocol, TypeVar, Union)
+from typing import (
+    Callable,
+    Generator,
+    Generic,
+    Iterable,
+    List,
+    Optional,
+    Protocol,
+    TypeVar,
+    Union,
+)
 
 from src.core.logger import logger
 
@@ -10,7 +19,7 @@ Context = TypeVar("Context")
 
 
 def error_handler(error: Exception, context: Context, next_step: NextStep):
-    logger.error(f'Error: {error}', exc_info=True)
+    logger.error(f"Error: {error}", exc_info=True)
     context.failed_records += 1
 
 
@@ -24,13 +33,12 @@ ErrorHandler = Callable[[Exception, Context, NextStep], None]
 
 class PipelineStep(Protocol[Context]):
     @abstractmethod
-    def __call__(
-        self, context: Context, next_step: NextStep
-    ) -> Generator[Context]:
-        ...
+    def __call__(self, context: Context, next_step: NextStep) -> Generator[Context]: ...
 
 
-def _default_error_handler(error: Exception, context: Context, next_step: NextStep) -> None:
+def _default_error_handler(
+    error: Exception, context: Context, next_step: NextStep
+) -> None:
     raise error
 
 
@@ -47,7 +55,9 @@ class PipelineCursor(Generic[Context]):
         next_step = PipelineCursor(self.queue[1:], self.error_handler)
 
         try:
-            print(f'========= Start step: {self.step_name(str(current_step))} =========')
+            print(
+                f"========= Start step: {self.step_name(str(current_step))} ========="
+            )
             current_step(context, next_step)
 
         except Exception as error:
@@ -55,8 +65,8 @@ class PipelineCursor(Generic[Context]):
 
     @staticmethod
     def step_name(name: str) -> str:
-        step_name = str(name).split('.')[-1]
-        return str(step_name).split(' ')[0]
+        step_name = str(name).split(".")[-1]
+        return str(step_name).split(" ")[0]
 
 
 class Pipeline(Generic[Context]):
@@ -66,7 +76,9 @@ class Pipeline(Generic[Context]):
     def append(self, step: PipelineStep) -> None:
         self.queue.append(step)
 
-    def __call__(self, context: Context, error_handler: Optional[ErrorHandler] = None) -> None:
+    def __call__(
+        self, context: Context, error_handler: Optional[ErrorHandler] = None
+    ) -> None:
         execute = PipelineCursor(self.queue, error_handler or _default_error_handler)
         execute(context)
 

@@ -1,7 +1,13 @@
 from typing import Any, Optional
 
-from pydantic import (BaseModel, EmailStr, Field, constr, field_validator,
-                      model_validator)
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+    constr,
+    field_validator,
+    model_validator,
+)
 
 from src.auth.validators import validate_phone_number
 

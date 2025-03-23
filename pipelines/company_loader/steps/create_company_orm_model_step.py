@@ -6,6 +6,5 @@ class CreateCompanyORMStep:
     def __call__(self, context: Context, next_step: NextStep) -> None:
 
         company_orm = Company(
-            country_code='RU',
-
+            country_code="RU",
         )

@@ -13,30 +13,27 @@ class HandleContactsStep:
                     contacts.extend(
                         [
                             Contact(
-                                type=ContactType.WEBSITE,
-                                value=site,
-                                is_verified=False
-                            ) for site in val
-                         ]
+                                type=ContactType.WEBSITE, value=site, is_verified=False
+                            )
+                            for site in val
+                        ]
                     )
                 if key == "phones" and val:
                     contacts.extend(
                         [
                             Contact(
-                                type=ContactType.PHONE,
-                                value=phone,
-                                is_verified=False
-                            ) for phone in val
-                         ]
+                                type=ContactType.PHONE, value=phone, is_verified=False
+                            )
+                            for phone in val
+                        ]
                     )
                 if (key == "47.91.txt" or key == "emails") and val:
                     contacts.extend(
                         [
                             Contact(
-                                type=ContactType.EMAIL,
-                                value=email,
-                                is_verified=False
-                            ) for email in val
+                                type=ContactType.EMAIL, value=email, is_verified=False
+                            )
+                            for email in val
                         ]
                     )
 

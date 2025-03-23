@@ -1,32 +1,51 @@
+import random
 import re
 from datetime import datetime
-from typing import Optional
+from random import randint
+from typing import List, Optional
 
-from sqlalchemy import func, or_
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, func, or_
+from sqlalchemy.orm import Session, joinedload
 
 from pipelines.connector import ClusterDBSession, MarketplaceDBSession
 from pipelines.raw_model import RawCompany
-from src import CompanyFieldType, OkvedNode
+from src import Company, CompanyField, CompanyFieldType, OkvedNode
 from src.core.logger import logger
 
 
-def get_active_companies(offset: int, BATCH_SIZE: int,  _session: Session = ClusterDBSession):
+def get_active_companies(
+    offset: int, BATCH_SIZE: int, _session: Session = ClusterDBSession
+):
     with _session() as session:
-        res = session.query(RawCompany).filter(RawCompany.legal_name != "Индивидуальный предприниматель").limit(BATCH_SIZE).offset(offset).all()
+        res = (
+            session.query(RawCompany)
+            .filter(RawCompany.legal_name != "Индивидуальный предприниматель")
+            .limit(BATCH_SIZE)
+            .offset(offset)
+            .all()
+        )
         return res
 
 
-def get_company_okved(offset: int, BATCH_SIZE: int,  _session: Session = ClusterDBSession):
+def get_company_okved(
+    offset: int, BATCH_SIZE: int, _session: Session = ClusterDBSession
+):
     with _session() as session:
         res = session.query(RawCompany.okved).limit(BATCH_SIZE).offset(offset).all()
         return res
 
 
-def get_random_company_okved(BATCH_SIZE: int = 10000, _session: Session = ClusterDBSession):
+def get_random_company_okved(
+    BATCH_SIZE: int = 10000, _session: Session = ClusterDBSession
+):
     with _session() as session:
         # Случайным образом упорядочиваем записи и выбираем BATCH_SIZE записей
-        res = session.query(RawCompany.okved).order_by(func.random()).limit(BATCH_SIZE).all()
+        res = (
+            session.query(RawCompany.okved)
+            .order_by(func.random())
+            .limit(BATCH_SIZE)
+            .all()
+        )
         return res
 
 
@@ -37,35 +56,49 @@ def get_total_count(_session: Session = ClusterDBSession):
 
 def get_active_company_count(_session: Session = ClusterDBSession):
     with _session() as session:
-        count = session.query(func.count()).filter(
-            or_(
-                RawCompany.legal_entity_state == "Действующая компания",
-                RawCompany.legal_entity_state == "Действующая организация",
-                RawCompany.legal_entity_state.startswith("Юридическое лицо ликвидировано")
+        count = (
+            session.query(func.count())
+            .filter(
+                or_(
+                    RawCompany.legal_entity_state == "Действующая компания",
+                    RawCompany.legal_entity_state == "Действующая организация",
+                    RawCompany.legal_entity_state.startswith(
+                        "Юридическое лицо ликвидировано"
+                    ),
+                )
             )
-        ).scalar()
+            .scalar()
+        )
         return count
 
 
-def get_entrepreneurs(offset: int, BATCH_SIZE: int,  _session: Session = ClusterDBSession):
+def get_entrepreneurs(
+    offset: int, BATCH_SIZE: int, _session: Session = ClusterDBSession
+):
     with _session() as session:
-        res = session.query(RawCompany).filter(RawCompany.legal_entity_state == "Действующее ИП").limit(BATCH_SIZE).offset(offset).all()
+        res = (
+            session.query(RawCompany)
+            .filter(RawCompany.legal_entity_state == "Действующее ИП")
+            .limit(BATCH_SIZE)
+            .offset(offset)
+            .all()
+        )
         return res
 
 
 MONTHS = {
-    'января': 'January',
-    'февраля': 'February',
-    'марта': 'March',
-    'апреля': 'April',
-    'мая': 'May',
-    'июня': 'June',
-    'июля': 'July',
-    'августа': 'August',
-    'сентября': 'September',
-    'октября': 'October',
-    'ноября': 'November',
-    'декабря': 'December'
+    "января": "January",
+    "февраля": "February",
+    "марта": "March",
+    "апреля": "April",
+    "мая": "May",
+    "июня": "June",
+    "июля": "July",
+    "августа": "August",
+    "сентября": "September",
+    "октября": "October",
+    "ноября": "November",
+    "декабря": "December",
 }
 
 
@@ -103,7 +136,7 @@ def convert_to_numeric(value):
             "тыс": 1_000,
             "млн": 1_000_000,
             "млрд": 1_000_000_000,
-            "трлн": 1_000_000_000_000
+            "трлн": 1_000_000_000_000,
         }
 
         return int(number * multipliers.get(unit, 1))
@@ -111,7 +144,9 @@ def convert_to_numeric(value):
         return 0
 
 
-def get_okved_by_code(code: str, _session: Session = MarketplaceDBSession) -> Optional[str]:
+def get_okved_by_code(
+    code: str, _session: Session = MarketplaceDBSession
+) -> Optional[str]:
     with _session() as session:
         res = session.query(OkvedNode).filter(OkvedNode.code == code).first()
         if res is None:
@@ -119,9 +154,42 @@ def get_okved_by_code(code: str, _session: Session = MarketplaceDBSession) -> Op
         return res
 
 
-def get_all_field_types(_session: Session = MarketplaceDBSession) -> Optional[CompanyFieldType]:
+def get_all_field_types(
+    _session: Session = MarketplaceDBSession,
+) -> Optional[CompanyFieldType]:
     with _session() as session:
         res = session.query(CompanyFieldType).all()
         if res is None:
             print("Типы полей не найдены в базе данных")
         return res
+
+
+def get_random_proxy_obj(proxies: List[str]):
+    return {"https": random.choice(proxies)}
+
+
+def get_company_by_inn(session, inn: str):
+    """
+    Retrieve a Company by its 'inn' field from the CompanyField table.
+
+    :param session: SQLAlchemy session
+    :param inn: The INN value to search for
+    :return: The Company object if found, otherwise None
+    """
+
+    company = (
+        session.query(Company)
+        .join(CompanyField, Company.id == CompanyField.company_id)
+        .join(
+            CompanyFieldType, CompanyField.company_field_type_id == CompanyFieldType.id
+        )
+        .filter(
+            and_(
+                CompanyField.ru_data == inn,  # Filter by ru_data (INN value)
+                CompanyFieldType.en_name == "inn",  # Filter by field type en_name
+            )
+        )
+        .options(joinedload(Company.fields))  # Eager load fields if needed
+        .first()
+    )
+    return company

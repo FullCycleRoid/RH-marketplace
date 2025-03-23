@@ -71,4 +71,8 @@ class RawCompany(Base):
     inspections_section = Column(String)
 
     created_at = Column(DateTime, server_default=satext("TIMEZONE('utc', now())"))
-    updated_at = Column(DateTime, server_default=satext("TIMEZONE('utc', now())"), onupdate=satext("TIMEZONE('utc', now())"))
+    updated_at = Column(
+        DateTime,
+        server_default=satext("TIMEZONE('utc', now())"),
+        onupdate=satext("TIMEZONE('utc', now())"),
+    )

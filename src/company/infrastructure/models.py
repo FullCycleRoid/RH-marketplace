@@ -2,13 +2,34 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
-from sqlalchemy import (DECIMAL, Boolean, Column, DateTime, Enum, ForeignKey,
-                        Index, Integer, String, Text, UniqueConstraint, func)
+from sqlalchemy import (
+    DECIMAL,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import relationship
 
-from src.company.enums import (ContactType, DataType, EntityType, FieldType,
-                               LegalStatus, ManagerType, SystemStatus, ValidationType, TranslationMode)
+from src.company.enums import (
+    ContactType,
+    DataType,
+    EntityType,
+    FieldType,
+    LegalStatus,
+    ManagerType,
+    SystemStatus,
+    TranslationMode,
+    ValidationType,
+)
 from src.core.database.declarative_base import Base
 
 
@@ -66,7 +87,7 @@ class Company(Base):
         en_data: Optional[str] = None,
         json_data: dict = None,
         datetime_data: Optional[datetime] = None,
-        translation_mode: Optional[TranslationMode] = None
+        translation_mode: Optional[TranslationMode] = None,
     ):
         field = CompanyField(
             company_id=self.id,
@@ -81,71 +102,27 @@ class Company(Base):
         self.fields.append(field)
         return field
 
-    def add_manager(
-        self,
-        position: ManagerType,
-        full_name: str,
-        en_full_name: str = None,
-        inn: str = None,
-        since_on_position: datetime = None,
-    ):
-        manager = Manager(
-            company_id=self.id,
-            position=position,
-            full_name=full_name,
-            en_full_name=en_full_name,
-            inn=inn,
-            since_on_position=since_on_position,
-        )
+    def add_manager(self, manager: "Manager") -> "Manager":
+        manager.company_id = self.id
         self.managers.append(manager)
         return manager
 
-    def add_contact(
-        self,
-        type: ContactType,
-        data: str,
-        is_verified: bool,
-    ):
-        contact = Contact(
-            company_id=self.id,
-            type=type,
-            data=data,
-            is_verified=is_verified,
-        )
+    def add_contact(self, contact: "Contact") -> "Contact":
+        contact.company_id = self.id
         self.contacts.append(contact)
         return contact
 
-    def add_tax_report(
-        self,
-        year: str,
-        taxes_paid: str,
-        paid_insurance: str,
-    ):
-        report = TaxReport(
-            company_id=self.id,
-            year=year,
-            taxes_paid=taxes_paid,
-            paid_insurance=paid_insurance,
-        )
-        self.tax_reports.append(report)
-        return report
+    def add_tax_report(self, tax_report: "TaxReport") -> "TaxReport":
+        tax_report.company_id = self.id
+        self.tax_reports.append(tax_report)
+        return tax_report
 
     def add_financial_report(
-        self,
-        year: str,
-        currency: str,
-        annual_income: str,
-        net_profit: str = None,
-    ):
-        report = FinancialReport(
-            company_id=self.id,
-            year=year,
-            currency=currency,
-            annual_income=annual_income,
-            net_profit=net_profit,
-        )
-        self.financial_reports.append(report)
-        return report
+        self, financial_report: "FinancialReport"
+    ) -> "FinancialReport":
+        financial_report.company_id = self.id
+        self.financial_reports.append(financial_report)
+        return financial_report
 
     def update_system_status(self, new_status: SystemStatus):
         """Обновляет системный статус компании"""
@@ -160,7 +137,6 @@ class Company(Base):
         changes: dict,
         reason: str = None,
     ):
-        """Создает запись в логе изменений"""
         log_entry = CompanyChangeLog(
             company_id=self.id,
             entity_type=entity_type,
@@ -227,7 +203,9 @@ class CompanyField(Base):
     datetime_data = Column(DateTime(timezone=True), nullable=True)
 
     is_translatable = Column(Boolean, nullable=False, default=False)
-    translation_mode = Column(Enum(TranslationMode, name='translation_mode'), nullable=True, default=None)
+    translation_mode = Column(
+        Enum(TranslationMode, name="translation_mode"), nullable=True, default=None
+    )
 
     field_type = relationship("CompanyFieldType", back_populates="fields")
     company = relationship("Company", back_populates="fields")

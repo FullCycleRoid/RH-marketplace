@@ -1,12 +1,15 @@
 from pipelines.company_loader.dto import Manager
 from pipelines.generic_pipeline import Context, NextStep
-from pipelines.utils import convert_ru_date_to_date_obj
+from pipelines.utils import convert_ru_date_to_date_obj, get_random_proxy_obj
 from src.company.enums import ManagerType
-from src.core.language_translator.proxy_google_translator2 import translate, proxy_settings
+from src.core.language_translator.proxy_google_translator2 import (
+    translate,
+    translate_large_text,
+)
 
 
 class AddDirectorStep:
-    def __init__(self, translator = None):
+    def __init__(self, translator=None):
         self.translator = translator
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
@@ -14,24 +17,26 @@ class AddDirectorStep:
         since_on_position = context.raw_company.director_since
 
         if since_on_position:
-            since_on_position = context.raw_company.director_since.replace('г.', 'года')
-            since_on_position = since_on_position.replace('с ', '')
+            since_on_position = context.raw_company.director_since.replace("г.", "года")
+            since_on_position = since_on_position.replace("с ", "")
             since_on_position = convert_ru_date_to_date_obj(since_on_position)
 
         if director_name:
             CEO = Manager(
-                    position=ManagerType.CEO,
-                    full_name=director_name,
-                    en_full_name=translate(director_name, proxies=proxy_settings),
-                    since_on_position=since_on_position
-                )
+                position=ManagerType.CEO,
+                full_name=director_name,
+                en_full_name=translate_large_text(
+                    director_name, proxy_obj=get_random_proxy_obj(context.proxies)
+                ),
+                since_on_position=since_on_position,
+            )
 
             context.company_dto.management.append(CEO)
         next_step(context)
 
     def split_full_name(self, director_name: str):
         if director_name:
-            split_name = director_name.split(' ')
+            split_name = director_name.split(" ")
             if len(split_name) == 3:
                 surname, name, patronymic = split_name
 
@@ -40,7 +45,7 @@ class AddDirectorStep:
                 patronymic = None
 
             if len(split_name) == 4:
-                surname, name, patronymic1, patronymic2  = split_name
+                surname, name, patronymic1, patronymic2 = split_name
                 patronymic = patronymic1 + patronymic2
 
         return name, patronymic, surname

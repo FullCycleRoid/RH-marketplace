@@ -9,10 +9,10 @@ class HandleFinancialReportStep:
         net_profit = convert_to_numeric(context.raw_company.net_profit)
         context.company_dto.financial_reports.append(
             FinancialReport(
-                year='2023',
+                year="2023",
                 annual_income=annual_income,
                 net_profit=net_profit,
-                currency='RUB'
+                currency="RUB",
             )
         )
 
