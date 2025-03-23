@@ -11,6 +11,8 @@ class CreateCompanyDTOStep(PipelineStep):
         self.translator = translator
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
+        en_name = en_legal_name = en_address = None
+
         if context.raw_company.legal_address:
             en_address = translate_large_text(
                 context.raw_company.legal_address,
