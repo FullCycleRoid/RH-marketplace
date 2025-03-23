@@ -32,7 +32,7 @@ class HandleReliabilityAssessmentStep(PipelineStep):
 
                 en_assessments.append(en_assessment)
 
-            context.company_dto.advantages.extend(ru_assessments)
+            context.company_dto.ru_advantages.extend(ru_assessments)
             context.company_dto.en_advantages.extend(en_assessments)
 
             print("***********   ReliabilityAssessment   ***********")

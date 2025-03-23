@@ -46,8 +46,12 @@ class HandleAdvantagesStep(PipelineStep):
                 print("*********** ADVANTAGES *************")
                 print(ru_advantages)
                 print(en_advantages)
-                context.company_dto.ru_advantages = ru_advantages
-                context.company_dto.en_advantages = en_advantages
+                full_ru_advantages = context.company_dto.ru_advantages
+                full_ru_advantages += ru_advantages
+                full_en_advantages = context.company_dto.en_advantages
+                full_en_advantages += en_advantages
+                context.company_dto.ru_advantages = set(full_ru_advantages)
+                context.company_dto.en_advantages = set(full_en_advantages)
                 print("**************************************")
 
             except json.JSONDecodeError as e:
