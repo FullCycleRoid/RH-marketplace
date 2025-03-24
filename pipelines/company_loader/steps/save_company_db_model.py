@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import Dict
 
 from sqlalchemy import create_engine
@@ -8,12 +9,30 @@ from pipelines.company_loader.context import CompanyDTO
 from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import get_company_by_inn
 from src import (Company, CompanyOKVED, Contact, FinancialReport, Manager,
-                 TaxReport)
+                 TaxReport, CompanyFieldType, FieldTypeTranslation, CompanyTranslation, FieldTranslation, CompanyField)
 from src.company.enums import TranslationMode
 
 
 class BuildCompanyDBModel(PipelineStep):
     _sessionmaker = None
+
+    def __init__(self):
+        self.field_type_cache = {}  # Кэш для типов полей { (country_code, name): id }
+
+    def _cache_field_types(self, session):
+        """Загружаем типы полей и их переводы в кэш"""
+        field_types = session.query(CompanyFieldType).all()
+        translations = session.query(FieldTypeTranslation).filter_by(language_code='ru').all()
+
+        for ft in field_types:
+            translation = next((t for t in translations if t.field_type_id == ft.id), None)
+            if translation:
+                key = (ft.country_code, translation.name)
+                self.field_type_cache[key] = ft.id
+
+    def _get_field_type_id(self, country_code: str, field_name_ru: str) -> uuid.UUID:
+        """Получаем ID типа поля по русскому названию"""
+        return self.field_type_cache.get((country_code, field_name_ru))
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
         if BuildCompanyDBModel._sessionmaker is None:
@@ -31,191 +50,105 @@ class BuildCompanyDBModel(PipelineStep):
             )
 
         with BuildCompanyDBModel._sessionmaker() as session:
-            ctx_company: CompanyDTO = context.company_dto
+            self._cache_field_types(session)
+        ctx_company = context.company_dto
 
-            company_exists = get_company_by_inn(session, ctx_company.inn)
-            if not company_exists:
+        if not get_company_by_inn(session, ctx_company.inn):
+            company = Company(
+                country_code=ctx_company.country_code,
+                legal_status=ctx_company.legal_status,
+                system_status=ctx_company.system_status,
+            )
+            session.add(company)
+            session.flush()
 
-                field_type_ids: Dict[str, uuid] = context.field_type_ids
+            # Добавление основных полей компании
+            fields_mapping = [
+                ('name', 'Название компании', ctx_company.name),
+                ('legal_name', 'Юридическое название', ctx_company.legal_name),
+                ('inn', 'ИНН', ctx_company.inn),
+                ('ogrn', 'ОГРН', ctx_company.ogrn),
+                ('okpo', 'ОКПО', ctx_company.okpo),
+                ('registration_date', 'Дата регистрации', ctx_company.registration_date),
+                ('okato_code', 'ОКАТО', ctx_company.okato_code),
+                ('oktmo_code', 'ОКТМО', ctx_company.oktmo_code),
+                ('okogu_code', 'ОКОГУ', ctx_company.okogu_code),
+                ('okopf_code', 'ОКОПФ', ctx_company.okopf_code),
+                ('okfs_code', 'ОКФС', ctx_company.okfs_code),
+            ]
 
-                company = Company(
-                    country_code=ctx_company.country_code,
-                    legal_status=ctx_company.legal_status,
-                    system_status=ctx_company.system_status,
+            for field_name, ru_name, value in fields_mapping:
+                if value is None:
+                    continue
+
+                field_type_id = self._get_field_type_id(ctx_company.country_code, ru_name)
+                if not field_type_id:
+                    continue
+
+                field = CompanyField(
+                    company_id=company.id,
+                    company_field_type_id=field_type_id,
+                    is_translatable=field_name in ['name', 'legal_name'],
+                    translation_mode=TranslationMode.AUTO if field_name in ['name', 'legal_name'] else None
                 )
 
-                for name, type_id in field_type_ids.items():
-                    if name == "name":
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.name,
-                            en_data=ctx_company.en_name,
-                            is_translatable=True,
-                            translation_mode=TranslationMode.AUTO,
-                        )
-                    if name == "legal_name":
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.legal_name,
-                            en_data=ctx_company.en_legal_name,
-                            is_translatable=True,
-                            translation_mode=TranslationMode.AUTO,
-                        )
-                    if name == "inn":
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.inn,
-                            en_data=ctx_company.inn,
-                            is_translatable=False,
-                        )
-                    if name == "ogrn" and ctx_company.ogrn:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.ogrn,
-                            en_data=ctx_company.ogrn,
-                            is_translatable=False,
-                        )
-                    if name == "kpp" and ctx_company.kpp:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.kpp,
-                            en_data=ctx_company.kpp,
-                            is_translatable=False,
-                        )
-                    if name == "okpo" and ctx_company.okpo:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.okpo,
-                            en_data=ctx_company.okpo,
-                            is_translatable=False,
-                        )
-                    if name == "okogu_code" and ctx_company.okogu_code:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.okogu_code,
-                            en_data=ctx_company.okogu_code,
-                            is_translatable=False,
-                        )
-                    if name == "okopf_code" and ctx_company.okopf_code:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.okopf_code,
-                            en_data=ctx_company.okopf_code,
-                            is_translatable=False,
-                        )
-                    if name == "okfs_code" and ctx_company.okfs_code:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.okfs_code,
-                            en_data=ctx_company.okfs_code,
-                            is_translatable=False,
-                        )
-                    if name == "okato_code" and ctx_company.okato_code:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.okato_code,
-                            en_data=ctx_company.okato_code,
-                            is_translatable=False,
-                        )
-                    if name == "oktmo_code" and ctx_company.oktmo_code:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.oktmo_code,
-                            en_data=ctx_company.oktmo_code,
-                            is_translatable=False,
-                        )
-                    if name == "kladr_code" and ctx_company.code_kladr:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.code_kladr,
-                            en_data=ctx_company.code_kladr,
-                            is_translatable=False,
-                        )
-                    if name == "registration_date" and ctx_company.registration_date:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            datetime_data=ctx_company.registration_date,
-                            is_translatable=False,
-                        )
-                    if name == "liquidation_date" and ctx_company.liquidation_date:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            datetime_data=ctx_company.liquidation_date,
-                            is_translatable=False,
-                        )
-                    if name == "authorized_capital" and ctx_company.authorized_capital:
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.authorized_capital,
-                            en_data=ctx_company.authorized_capital,
-                            is_translatable=False,
-                        )
-                    if (
-                        name == "average_number_of_employees"
-                        and ctx_company.average_number_of_employees
-                    ):
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ctx_company.average_number_of_employees,
-                            en_data=ctx_company.average_number_of_employees,
-                            is_translatable=False,
-                        )
+                if isinstance(value, datetime.date):
+                    field.datetime_data = value
+                else:
+                    field.ru_data = str(value)
 
-                    if name == "advantages" and ctx_company.advantages:
-                        ru_advantages = ", ".join(ctx_company.advantages)
-                        en_advantages = ", ".join(ctx_company.en_advantages)
-                        company.add_field(
-                            company_field_type_id=type_id,
-                            ru_data=ru_advantages,
-                            en_data=en_advantages,
-                            is_translatable=True,
-                            translation_mode=TranslationMode.AUTO,
-                        )
-
-                session.add(company)
+                session.add(field)
                 session.flush()
 
-                for contact in ctx_company.contacts:
-                    contact_obj = Contact(
-                        type=contact.type,
-                        data=contact.value,
-                        is_verified=contact.is_verified,
+                # Добавляем русский перевод для поля
+                if field.is_translatable:
+                    translation = FieldTranslation(
+                        field_id=field.id,
+                        language_code='ru',
+                        data=str(value)
                     )
-                    company.add_contact(contact_obj)
+                    session.add(translation)
 
-                for manager in ctx_company.management:
-                    manager_obj = Manager(
-                        position=manager.position,
-                        full_name=manager.full_name,
-                        en_full_name=manager.en_full_name,
-                        inn=manager.inn,
-                        since_on_position=manager.since_on_position,
-                    )
-                    company.add_manager(manager_obj)
+            # Добавление преимуществ
+            if ctx_company.advantages:
+                ru_advantages = '\n'.join(ctx_company.advantages)
+                company_translation = CompanyTranslation(
+                    company_id=company.id,
+                    language_code='ru',
+                    advantages=ru_advantages
+                )
+                session.add(company_translation)
 
-                for report in ctx_company.tax_reports:
-                    if report.taxes_paid and report.paid_insurance:
-                        report_obj = TaxReport(
-                            year=report.year,
-                            taxes_paid=report.taxes_paid,
-                            paid_insurance=report.paid_insurance,
-                        )
-                        company.add_tax_report(report_obj)
+            # Финансовые отчеты
+            for report in ctx_company.financial_reports:
+                financial_report = FinancialReport(
+                    company_id=company.id,
+                    year=report.year,
+                    annual_income=report.annual_income,
+                    net_profit=report.net_profit,
+                    currency=report.currency
+                )
+                session.add(financial_report)
 
-                for report in ctx_company.financial_reports:
-                    if report.annual_income or report.net_profit:
-                        report_obj = FinancialReport(
-                            year=report.year,
-                            currency=report.currency,
-                            annual_income=report.annual_income,
-                            net_profit=report.net_profit,
-                        )
-                        company.add_financial_report(report_obj)
+            # Налоговые отчеты
+            for report in ctx_company.tax_reports:
+                tax_report = TaxReport(
+                    company_id=company.id,
+                    year=report.year,
+                    taxes_paid=report.taxes_paid,
+                    paid_insurance=report.paid_insurance
+                )
+                session.add(tax_report)
 
-                for okved_id in ctx_company.okved_ids:
-                    okved_obj = CompanyOKVED(company_id=company.id, okved_id=okved_id)
-                    session.add(okved_obj)
+            # ОКВЭД коды
+            for okved_id in ctx_company.okved_ids:
+                company_okved = CompanyOKVED(
+                    company_id=company.id,
+                    okved_id=okved_id
+                )
+                session.add(company_okved)
 
-                session.commit()
+            session.commit()
 
         next_step(context)
+

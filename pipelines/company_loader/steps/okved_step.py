@@ -41,5 +41,6 @@ class OkvedM2MIdsStep(PipelineStep):
                 continue
 
         context.company_dto.okved_ids = okved_ids
+
         pprint(context.company_dto.__dict__)
         next_step(context)

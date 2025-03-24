@@ -54,9 +54,9 @@ class CompanyDTO:
 
 @dataclass
 class CompanyContext:
-    field_type_ids: Dict[str, uuid.UUID]
     proxies: List[str]
     raw_company: RawCompany
+    field_type_ids: Dict[str, uuid.UUID] = field(default_factory=dict)
     company_dto: Optional[CompanyDTO] = None
     company_model: Optional[Company] = None
 

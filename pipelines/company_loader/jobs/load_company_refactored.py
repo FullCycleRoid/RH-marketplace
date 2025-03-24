@@ -31,16 +31,17 @@ from pipelines.generic_pipeline import Context, Pipeline, error_handler
 from pipelines.utils import get_active_companies, get_all_field_types
 from src import CompanyFieldType
 
-BATCH_SIZE = 100
+BATCH_SIZE = 20
 MAX_COMPANIES = 20_000_000
 
 
 def process_single_company(
-    company, field_type_ids, proxies, process_pipeline, error_handler
+    company, proxies, process_pipeline, error_handler
 ):
     """Обработка одной компании"""
     company_ctx = CompanyContext(
-        field_type_ids=field_type_ids, proxies=proxies, raw_company=company
+        proxies=proxies,
+        raw_company=company
     )
     process_pipeline(company_ctx, error_handler)
 
@@ -65,7 +66,7 @@ def process_batch_threaded(batch, process_pipeline, error_handler):
 
 
 def process_batch_multiprocess(
-    batch, field_type_ids, proxies, process_pipeline, error_handler
+    batch, proxies, process_pipeline, error_handler
 ):
     """Многопроцессная обработка батча"""
     ctx = multiprocessing.get_context("spawn")
@@ -75,7 +76,6 @@ def process_batch_multiprocess(
             executor.submit(
                 process_single_company,
                 company,
-                field_type_ids,
                 proxies,
                 process_pipeline,
                 error_handler,
@@ -89,12 +89,12 @@ def process_batch_multiprocess(
 def match_field_type_names() -> Dict:
     field_match = dict()
     field_names = [
-        "name",
-        "legal_name",
+        "name",  #  Company name
+        "legal_name",  # Legal company name
         "inn",
-        "registration_date",
-        "liquidation_date",
-        "legal_address",
+        "registration_date",  # Company registration date
+        "liquidation_date",   # Company liquidation date
+        "legal_address",   #   Legal address
         "ogrn",
         "kpp",
         "okpo",
@@ -128,7 +128,7 @@ def start_process(translator=None):
     start_process_time = time.perf_counter()
     offset = 0
 
-    field_type_ids = match_field_type_names()
+    # field_type_ids = match_field_type_names()
     PROXIES = load_proxies("../../../proxylist.txt")
 
     process_pipeline = Pipeline[Context](
@@ -155,7 +155,7 @@ def start_process(translator=None):
 
         start_batch_time = time.perf_counter()
         process_batch_multiprocess(
-            batch, field_type_ids, PROXIES, process_pipeline, error_handler
+            batch, PROXIES, process_pipeline, error_handler
         )
         process_batch_time = time.perf_counter() - start_batch_time
         process_time = time.perf_counter() - start_process_time
