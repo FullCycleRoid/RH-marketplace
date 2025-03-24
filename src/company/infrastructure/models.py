@@ -13,6 +13,7 @@ from src.company.enums import (ContactType, DataType, EntityType, FieldType,
 from src.core.database.declarative_base import Base
 
 
+
 class Company(Base):
     __tablename__ = "companies"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
