@@ -70,7 +70,7 @@ class Company(Base):
         json_data: dict = None,
         datetime_data: Optional[datetime] = None,
         translation_mode: Optional[TranslationMode] = None,
-    ):
+    ) -> "CompanyField":
         field = CompanyField(
             company_id=self.id,
             company_field_type_id=company_field_type_id,

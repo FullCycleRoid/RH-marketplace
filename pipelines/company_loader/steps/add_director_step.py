@@ -7,9 +7,6 @@ from src.core.language_translator.proxy_google_translator2 import (
 
 
 class AddDirectorStep(PipelineStep):
-    def __init__(self, translator=None):
-        self.translator = translator
-
     def __call__(self, context: Context, next_step: NextStep) -> None:
         director_name = context.raw_company.director_name
         since_on_position = context.raw_company.director_since
@@ -23,9 +20,6 @@ class AddDirectorStep(PipelineStep):
             CEO = Manager(
                 position=ManagerType.CEO,
                 full_name=director_name,
-                en_full_name=translate_large_text(
-                    director_name, proxy_obj=get_random_proxy_obj(context.proxies)
-                ),
                 since_on_position=since_on_position,
             )
 

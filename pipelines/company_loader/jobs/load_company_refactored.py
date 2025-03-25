@@ -124,7 +124,7 @@ def load_proxies(file_path: str) -> List[str]:
         return [f"https://{proxy.strip()}" for proxy in lines]
 
 
-def start_process(translator=None):
+def start_process():
     start_process_time = time.perf_counter()
     offset = 0
 
@@ -132,17 +132,17 @@ def start_process(translator=None):
     PROXIES = load_proxies("../../../proxylist.txt")
 
     process_pipeline = Pipeline[Context](
-        CreateCompanyDTOStep(translator),
+        CreateCompanyDTOStep(),
         ConvertRegistrationDateStep(),
         MatchLegalStateStep(),
         ConvertAuthorizedCapitalStep(),
         ConvertAverageNumberOfEmployeesStep(),
         HandleContactsStep(),
-        AddDirectorStep(translator),
+        AddDirectorStep(),
         HandleFinancialReportStep(),
         HandleTaxReportStep(),
-        HandleReliabilityAssessmentStep(translator),
-        HandleAdvantagesStep(translator),
+        HandleReliabilityAssessmentStep(),
+        HandleAdvantagesStep(),
         OkvedM2MIdsStep(),
         BuildCompanyDBModel(),
     )

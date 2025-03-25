@@ -30,8 +30,6 @@ class Address:
 class Manager:
     position: ManagerType
     full_name: str
-    en_full_name: str
-
     since_on_position: Optional[datetime]
     inn: Optional[str] = None
 
