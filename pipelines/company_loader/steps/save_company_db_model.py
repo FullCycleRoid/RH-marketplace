@@ -1,154 +1,176 @@
-import uuid
-from datetime import datetime
-from typing import Dict
+from src.core.database.postgres.session_manager import DatabaseSessionManager
+from src.core.logger import logger
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from pipelines.company_loader.context import CompanyDTO
 from pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from pipelines.utils import get_company_by_inn
-from src import (Company, CompanyOKVED, Contact, FinancialReport, Manager,
-                 TaxReport, CompanyFieldType, FieldTypeTranslation, CompanyTranslation, FieldTranslation, CompanyField)
+from src import (Company, CompanyOKVED, FinancialReport,
+                 TaxReport, FieldTranslation, Manager, ManagerTranslation, Contact)
 from src.company.enums import TranslationMode
 
 
-class BuildCompanyDBModel(PipelineStep):
+class BuildCompanyDBModelStep(PipelineStep):
     _sessionmaker = None
 
-    def __init__(self):
-        self.field_type_cache = {}  # Кэш для типов полей { (country_code, name): id }
-
-    def _cache_field_types(self, session):
-        """Загружаем типы полей и их переводы в кэш"""
-        field_types = session.query(CompanyFieldType).all()
-        translations = session.query(FieldTypeTranslation).filter_by(language_code='ru').all()
-
-        for ft in field_types:
-            translation = next((t for t in translations if t.field_type_id == ft.id), None)
-            if translation:
-                key = (ft.country_code, translation.name)
-                self.field_type_cache[key] = ft.id
-
-    def _get_field_type_id(self, country_code: str, field_name_ru: str) -> uuid.UUID:
-        """Получаем ID типа поля по русскому названию"""
-        return self.field_type_cache.get((country_code, field_name_ru))
+    @classmethod
+    def get_sessionmaker(cls):
+        if cls._sessionmaker is None:
+            cls._sessionmaker = DatabaseSessionManager.get_sessionmaker()
+        return cls._sessionmaker
 
     def __call__(self, context: Context, next_step: NextStep) -> None:
-        if BuildCompanyDBModel._sessionmaker is None:
-            async_postgres_uri = (
-                "postgresql+psycopg2://admin:password123@localhost:25432/monolith"
-            )
-            psycopg_engine = create_engine(
-                async_postgres_uri, echo=False, pool_size=200
-            )
-            BuildCompanyDBModel._sessionmaker = sessionmaker(
-                bind=psycopg_engine,
-                autoflush=False,
-                expire_on_commit=False,
-                autocommit=False,
-            )
+        with self.get_sessionmaker()() as session:
+            ctx_company = context.company_dto
 
-        with BuildCompanyDBModel._sessionmaker() as session:
-            self._cache_field_types(session)
-        ctx_company = context.company_dto
-
-        if not get_company_by_inn(session, ctx_company.inn):
-            company = Company(
-                country_code=ctx_company.country_code,
-                legal_status=ctx_company.legal_status,
-                system_status=ctx_company.system_status,
-            )
-            session.add(company)
-            session.flush()
-
-            # Добавление основных полей компании
-            fields_mapping = [
-                ('name', 'Название компании', ctx_company.name),
-                ('legal_name', 'Юридическое название', ctx_company.legal_name),
-                ('inn', 'ИНН', ctx_company.inn),
-                ('ogrn', 'ОГРН', ctx_company.ogrn),
-                ('okpo', 'ОКПО', ctx_company.okpo),
-                ('registration_date', 'Дата регистрации', ctx_company.registration_date),
-                ('okato_code', 'ОКАТО', ctx_company.okato_code),
-                ('oktmo_code', 'ОКТМО', ctx_company.oktmo_code),
-                ('okogu_code', 'ОКОГУ', ctx_company.okogu_code),
-                ('okopf_code', 'ОКОПФ', ctx_company.okopf_code),
-                ('okfs_code', 'ОКФС', ctx_company.okfs_code),
-            ]
-
-            for field_name, ru_name, value in fields_mapping:
-                if value is None:
-                    continue
-
-                field_type_id = self._get_field_type_id(ctx_company.country_code, ru_name)
-                if not field_type_id:
-                    continue
-
-                field = CompanyField(
-                    company_id=company.id,
-                    company_field_type_id=field_type_id,
-                    is_translatable=field_name in ['name', 'legal_name'],
-                    translation_mode=TranslationMode.AUTO if field_name in ['name', 'legal_name'] else None
+            if not get_company_by_inn(session, ctx_company.inn):
+                company = Company(
+                    country_code=ctx_company.country_code,
+                    legal_status=ctx_company.legal_status,
+                    system_status=ctx_company.system_status,
                 )
-
-                if isinstance(value, datetime.date):
-                    field.datetime_data = value
-                else:
-                    field.ru_data = str(value)
-
-                session.add(field)
+                session.add(company)
                 session.flush()
 
-                # Добавляем русский перевод для поля
-                if field.is_translatable:
-                    translation = FieldTranslation(
-                        field_id=field.id,
-                        language_code='ru',
-                        data=str(value)
+                # Добавление русского перевода для компании
+                if ctx_company.name:
+                    company.add_translation(
+                        language_code="RU",
+                        name=ctx_company.name,
                     )
-                    session.add(translation)
 
-            # Добавление преимуществ
-            if ctx_company.advantages:
-                ru_advantages = '\n'.join(ctx_company.advantages)
-                company_translation = CompanyTranslation(
-                    company_id=company.id,
-                    language_code='ru',
-                    advantages=ru_advantages
-                )
-                session.add(company_translation)
+                if ctx_company.en_name:
+                    company.add_translation(
+                        language_code="EN",
+                        name=ctx_company.en_name,
+                    )
 
-            # Финансовые отчеты
-            for report in ctx_company.financial_reports:
-                financial_report = FinancialReport(
-                    company_id=company.id,
-                    year=report.year,
-                    annual_income=report.annual_income,
-                    net_profit=report.net_profit,
-                    currency=report.currency
-                )
-                session.add(financial_report)
+            # Маппинг полей компании
+                fields_config = {
+                    'legal_name': (ctx_company.legal_name, 'STRING'),
+                    'legal_description': (ctx_company.legal_description, 'STRING'),
+                    'inn': (ctx_company.inn, 'CODE'),
+                    'registration_date': (ctx_company.registration_date, 'DATE'),
+                    'liquidation_date': (ctx_company.liquidation_date, 'DATE'),
+                    'legal_address': (ctx_company.legal_address, 'STRING'),
+                    'ogrn': (ctx_company.ogrn, 'CODE'),
+                    'kpp': (ctx_company.kpp, 'CODE'),
+                    'okpo': (ctx_company.okpo, 'CODE'),
+                    'authorized_capital': (ctx_company.authorized_capital, 'STRING'),
+                    'average_number_of_employees': (ctx_company.average_number_of_employees, 'STRING'),
+                    'okogu_code': (ctx_company.okogu_code, 'CODE'),
+                    'okopf_code': (ctx_company.okopf_code, 'CODE'),
+                    'okfs_code': (ctx_company.okfs_code, 'CODE'),
+                    'okato_code': (ctx_company.okato_code, 'CODE'),
+                    'oktmo_code': (ctx_company.oktmo_code, 'CODE'),
+                    'kladr_code': (ctx_company.code_kladr, 'CODE'),
+                    'advantages': (ctx_company.ready_advantages, 'STRING'),
+                }
 
-            # Налоговые отчеты
-            for report in ctx_company.tax_reports:
-                tax_report = TaxReport(
-                    company_id=company.id,
-                    year=report.year,
-                    taxes_paid=report.taxes_paid,
-                    paid_insurance=report.paid_insurance
-                )
-                session.add(tax_report)
+                for field_name, (value, data_type) in fields_config.items():
+                    if value is None or value == '' or value == (' '
+                                                                 ''):
+                        continue
 
-            # ОКВЭД коды
-            for okved_id in ctx_company.okved_ids:
-                company_okved = CompanyOKVED(
-                    company_id=company.id,
-                    okved_id=okved_id
-                )
-                session.add(company_okved)
+                    field_type_id = context.field_type_ids.get(field_name)
+                    if not field_type_id:
+                        continue
 
-            session.commit()
+                    try:
+                        # Создаем поле
+                        field = company.add_field(
+                            company_field_type_id=field_type_id,
+                            is_translatable=True,
+                            translation_mode=TranslationMode.AUTO
+                        )
+
+                        # Добавляем русский перевод
+                        if data_type == 'STRING':
+                            field.translations.append(
+                                FieldTranslation(
+                                    language_code='RU',
+                                    data=str(value)
+                                )
+                            )
+                        elif data_type == 'DATE':
+                            field.datetime_data = value
+                        elif data_type == 'CODE':
+                            field.code = value
+                        elif data_type == 'ARRAY':
+                            field.json_data = {'data': list(value)}
+
+                    except Exception as e:
+                        logger.error(f"Ошибка добавления поля {field_name}: {str(e)}")
+                        context.failed_records += 1
+
+                for contact in ctx_company.contacts:
+                    contact_obj = Contact(
+                        type=contact.type,
+                        data=contact.value,
+                        is_verified=contact.is_verified,
+                    )
+                    company.add_contact(contact_obj)
+
+                # Добавление менеджеров
+                for manager_dto in ctx_company.management:
+                    try:
+                        manager = Manager(
+                            position=manager_dto.position,
+                            inn=manager_dto.inn,
+                            since_on_position=manager_dto.since_on_position
+                        )
+
+                        # Добавляем русский перевод ФИО
+                        manager.translations.append(
+                            ManagerTranslation(
+                                language_code='RU',
+                                full_name=manager_dto.full_name
+                            )
+                        )
+
+                        company.managers.append(manager)
+                    except Exception as e:
+                        logger.error(f"Ошибка добавления менеджера: {str(e)}")
+                        context.failed_records += 1
+
+                # Финансовые отчеты
+                for report in ctx_company.financial_reports:
+                    try:
+                        financial_report = FinancialReport(
+                            year=report.year,
+                            annual_income=report.annual_income,
+                            net_profit=report.net_profit,
+                            currency=report.currency
+                        )
+                        company.financial_reports.append(financial_report)
+                    except Exception as e:
+                        logger.error(f"Ошибка финансового отчета: {str(e)}")
+                        context.failed_records += 1
+
+                # Налоговые отчеты
+                for report in ctx_company.tax_reports:
+                    try:
+                        tax_report = TaxReport(
+                            year=report.year,
+                            taxes_paid=report.taxes_paid,
+                            paid_insurance=report.paid_insurance
+                        )
+                        company.tax_reports.append(tax_report)
+                    except Exception as e:
+                        logger.error(f"Ошибка налогового отчета: {str(e)}")
+                        context.failed_records += 1
+
+                # Привязка OKVED кодов
+                for okved_id in ctx_company.okved_ids:
+                    try:
+                        okved_obj = CompanyOKVED(company_id=company.id, okved_id=okved_id)
+                        session.add(okved_obj)
+                    except Exception as e:
+                        logger.error(f"Ошибка привязки OKVED: {str(e)}")
+                        context.failed_records += 1
+                try:
+                    session.commit()
+                except Exception as e:
+                    logger.error(f"Ошибка коммита: {str(e)}")
+                    session.rollback()
+                    context.failed_records += 1
 
         next_step(context)
-

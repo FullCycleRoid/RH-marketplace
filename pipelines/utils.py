@@ -1,15 +1,15 @@
 import random
 import re
 from datetime import datetime
-from random import randint
 from typing import List, Optional
 
-from sqlalchemy import and_, func, or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
 from pipelines.connector import ClusterDBSession, MarketplaceDBSession
 from pipelines.raw_model import RawCompany
-from src import Company, CompanyField, CompanyFieldType, OkvedNode
+from src import Company, CompanyField, CompanyFieldType, OkvedNode, FieldTypeTranslation, FieldTranslation, \
+    CompanyOKVED, Manager
 from src.core.logger import logger
 
 
@@ -20,6 +20,7 @@ def get_active_companies(
         res = (
             session.query(RawCompany)
             .filter(RawCompany.legal_name != "Индивидуальный предприниматель")
+            .filter(RawCompany.legal_name.isnot(None))  # или .filter(RawCompany.legal_name != None)
             .limit(BATCH_SIZE)
             .offset(offset)
             .all()
@@ -156,12 +157,9 @@ def get_okved_by_code(
 
 def get_all_field_types(
     _session: Session = MarketplaceDBSession,
-) -> Optional[CompanyFieldType]:
+) -> List[CompanyFieldType]:
     with _session() as session:
-        res = session.query(CompanyFieldType).all()
-        if res is None:
-            print("Типы полей не найдены в базе данных")
-        return res
+        return session.query(CompanyFieldType).options(joinedload(CompanyFieldType.translations)).all()
 
 
 def get_random_proxy_obj(proxies: List[str]):
@@ -176,20 +174,34 @@ def get_company_by_inn(session, inn: str):
     :param inn: The INN value to search for
     :return: The Company object if found, otherwise None
     """
+    from sqlalchemy.orm import joinedload
+    from sqlalchemy import or_, and_
 
     company = (
         session.query(Company)
         .join(CompanyField, Company.id == CompanyField.company_id)
+        .join(CompanyFieldType, CompanyField.company_field_type_id == CompanyFieldType.id)
         .join(
-            CompanyFieldType, CompanyField.company_field_type_id == CompanyFieldType.id
-        )
-        .filter(
+            FieldTypeTranslation,
             and_(
-                CompanyField.ru_data == inn,  # Filter by ru_data (INN value)
-                CompanyFieldType.en_name == "inn",  # Filter by field type en_name
+                CompanyFieldType.id == FieldTypeTranslation.field_type_id,
+                FieldTypeTranslation.language_code == "EN",
+                FieldTypeTranslation.name == "inn"
             )
         )
-        .options(joinedload(Company.fields))  # Eager load fields if needed
+        .outerjoin(
+            FieldTranslation,
+            and_(
+                CompanyField.id == FieldTranslation.field_id,
+                FieldTranslation.language_code == "RU"
+            )
+        )
+        .filter(
+            or_(
+                FieldTranslation.data == inn
+            )
+        )
+        .options(joinedload(Company.fields))
         .first()
     )
     return company

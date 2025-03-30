@@ -20,6 +20,8 @@ class HandleAdvantagesStep(PipelineStep):
 
                 print("*********** ADVANTAGES *************")
                 context.company_dto.advantages.extend(ru_advantages)
+                context.company_dto.ready_advantages = ','.join(context.company_dto.advantages)
+
                 print("**************************************")
 
             except json.JSONDecodeError as e:

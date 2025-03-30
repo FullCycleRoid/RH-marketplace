@@ -1,13 +1,27 @@
 from pipelines.company_loader.dto import Manager
 from pipelines.generic_pipeline import Context, NextStep, PipelineStep
-from pipelines.utils import convert_ru_date_to_date_obj, get_random_proxy_obj
+from pipelines.utils import convert_ru_date_to_date_obj
 from src.company.enums import ManagerType
-from src.core.language_translator.proxy_google_translator2 import (
-    translate, translate_large_text)
+
+
+def extract_inn_by_director(text, director_name):
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+
+    for i, line in enumerate(lines):
+        if director_name in line:
+            if i + 1 < len(lines) and lines[i + 1].startswith("ИНН"):
+                inn_line =  lines[i + 1]
+                separated = inn_line.split(" ")
+                if len(separated) == 2:
+                    inn = separated[1]
+                    return inn
+
+    return None
 
 
 class AddDirectorStep(PipelineStep):
     def __call__(self, context: Context, next_step: NextStep) -> None:
+        inn = None
         director_name = context.raw_company.director_name
         since_on_position = context.raw_company.director_since
 
@@ -16,28 +30,17 @@ class AddDirectorStep(PipelineStep):
             since_on_position = since_on_position.replace("с ", "")
             since_on_position = convert_ru_date_to_date_obj(since_on_position)
 
+        if context.raw_company.management_section and director_name:
+            section = context.raw_company.management_section
+            inn = extract_inn_by_director(section, director_name)
+
         if director_name:
             CEO = Manager(
                 position=ManagerType.CEO,
                 full_name=director_name,
                 since_on_position=since_on_position,
+                inn=inn
             )
 
             context.company_dto.management.append(CEO)
         next_step(context)
-
-    def split_full_name(self, director_name: str):
-        if director_name:
-            split_name = director_name.split(" ")
-            if len(split_name) == 3:
-                surname, name, patronymic = split_name
-
-            if len(split_name) == 2:
-                surname, name = split_name
-                patronymic = None
-
-            if len(split_name) == 4:
-                surname, name, patronymic1, patronymic2 = split_name
-                patronymic = patronymic1 + patronymic2
-
-        return name, patronymic, surname

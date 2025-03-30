@@ -6,7 +6,7 @@ from typing import Dict, List
 from pipelines.company_loader.context import CompanyContext
 from pipelines.company_loader.steps.add_director_step import AddDirectorStep
 from pipelines.company_loader.steps.save_company_db_model import \
-    BuildCompanyDBModel
+    BuildCompanyDBModelStep
 from pipelines.company_loader.steps.convert_registration_date import \
     ConvertRegistrationDateStep
 from pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep
@@ -31,18 +31,34 @@ from pipelines.generic_pipeline import Context, Pipeline, error_handler
 from pipelines.utils import get_active_companies, get_all_field_types
 from src import CompanyFieldType
 
-BATCH_SIZE = 20
+
+BATCH_SIZE = 100_000
 MAX_COMPANIES = 20_000_000
 
 
-def process_single_company(
-    company, proxies, process_pipeline, error_handler
-):
+def process_single_company(company, field_type_ids, error_handler):
     """Обработка одной компании"""
     company_ctx = CompanyContext(
-        proxies=proxies,
+        field_type_ids=field_type_ids,
         raw_company=company
     )
+
+    process_pipeline = Pipeline[Context](
+        CreateCompanyDTOStep(),
+        ConvertRegistrationDateStep(),
+        MatchLegalStateStep(),
+        ConvertAuthorizedCapitalStep(),
+        ConvertAverageNumberOfEmployeesStep(),
+        HandleContactsStep(),
+        AddDirectorStep(),
+        HandleFinancialReportStep(),
+        HandleTaxReportStep(),
+        HandleReliabilityAssessmentStep(),
+        HandleAdvantagesStep(),
+        OkvedM2MIdsStep(),
+        BuildCompanyDBModelStep(),
+    )
+
     process_pipeline(company_ctx, error_handler)
 
 
@@ -62,22 +78,22 @@ def process_batch_threaded(batch, process_pipeline, error_handler):
             for company in batch
         ]
         for future in futures:
-            future.result()  # Ожидаем завершения всех задач
+            future.result()
 
 
-def process_batch_multiprocess(
-    batch, proxies, process_pipeline, error_handler
-):
+def process_batch_multiprocess(batch, field_type_ids, error_handler):
     """Многопроцессная обработка батча"""
     ctx = multiprocessing.get_context("spawn")
 
-    with ProcessPoolExecutor(mp_context=ctx) as executor:
+    with ProcessPoolExecutor(
+            max_workers=100,
+            mp_context=ctx
+    ) as executor:
         futures = [
             executor.submit(
                 process_single_company,
                 company,
-                proxies,
-                process_pipeline,
+                field_type_ids,
                 error_handler,
             )
             for company in batch
@@ -89,12 +105,13 @@ def process_batch_multiprocess(
 def match_field_type_names() -> Dict:
     field_match = dict()
     field_names = [
-        "name",  #  Company name
-        "legal_name",  # Legal company name
+        "advantages",
+        "legal_description",
+        "legal_name",
         "inn",
-        "registration_date",  # Company registration date
-        "liquidation_date",   # Company liquidation date
-        "legal_address",   #   Legal address
+        "registration_date",
+        "liquidation_date",
+        "legal_address",
         "ogrn",
         "kpp",
         "okpo",
@@ -111,13 +128,14 @@ def match_field_type_names() -> Dict:
     field_types: List[CompanyFieldType] = get_all_field_types()
 
     for name in field_names:
-        for type in field_types:
-            if name == type.en_name:
-                field_match[name] = type.id
+        for field_type in field_types:
+            for translation in field_type.translations:
+                if name == translation.name:
+                    field_match[name] = field_type.id
 
     return field_match
 
-
+# PROXIES = load_proxies("../../../proxylist.txt")
 def load_proxies(file_path: str) -> List[str]:
     with open(file_path, "r") as f:
         lines = f.readlines()
@@ -125,45 +143,27 @@ def load_proxies(file_path: str) -> List[str]:
 
 
 def start_process():
+    OFFSET = 0
     start_process_time = time.perf_counter()
-    offset = 0
 
-    # field_type_ids = match_field_type_names()
-    PROXIES = load_proxies("../../../proxylist.txt")
-
-    process_pipeline = Pipeline[Context](
-        CreateCompanyDTOStep(),
-        ConvertRegistrationDateStep(),
-        MatchLegalStateStep(),
-        ConvertAuthorizedCapitalStep(),
-        ConvertAverageNumberOfEmployeesStep(),
-        HandleContactsStep(),
-        AddDirectorStep(),
-        HandleFinancialReportStep(),
-        HandleTaxReportStep(),
-        HandleReliabilityAssessmentStep(),
-        HandleAdvantagesStep(),
-        OkvedM2MIdsStep(),
-        BuildCompanyDBModel(),
-    )
-
-    while offset < MAX_COMPANIES:
-        batch = get_active_companies(offset, BATCH_SIZE)
+    field_type_ids = match_field_type_names()
+    while OFFSET < MAX_COMPANIES:
+        batch = get_active_companies(OFFSET, BATCH_SIZE)
 
         if not batch:
             break
 
         start_batch_time = time.perf_counter()
-        process_batch_multiprocess(
-            batch, PROXIES, process_pipeline, error_handler
-        )
+
+        process_batch_multiprocess(batch, field_type_ids, error_handler)
+
         process_batch_time = time.perf_counter() - start_batch_time
         process_time = time.perf_counter() - start_process_time
 
-        offset += BATCH_SIZE
-        print(f"Обрабатано {offset} компаний. ")
+        OFFSET += BATCH_SIZE
+        print(f"Обрабатано {OFFSET} компаний. ")
         print(f"{BATCH_SIZE} компаний обработано за {process_batch_time:.2f} сек")
-        print(f"Всего {offset} компаний обработано за {process_time:.2f} сек")
+        print(f"Всего {OFFSET} компаний обработано за {process_time:.2f} сек")
 
 
 if __name__ == "__main__":

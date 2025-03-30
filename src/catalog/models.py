@@ -16,6 +16,8 @@ class OkvedNode(Base):
     parent = relationship("OkvedNode", remote_side=[id], back_populates="child_nodes")
     child_nodes = relationship("OkvedNode", back_populates="parent")
 
+    companies = relationship("CompanyOKVED", back_populates="okved")
+
     def __repr__(self):
         return f"<OkvedNode(code={self.code}, description={self.name})>"
 
@@ -79,7 +81,6 @@ class CatalogCategory(Base):
         return f"<CatalogCategory(name={self.name})>"
 
 
-# Таблицы для связей многие-ко-многим
 class CatalogOkvedLink(Base):
     __tablename__ = "catalog_okved_links"
     category_id = Column(Integer, ForeignKey("catalog_categories.id"), primary_key=True)

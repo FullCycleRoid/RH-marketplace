@@ -55,39 +55,87 @@ class Company(Base):
         "CompanyTranslation", back_populates="company", cascade="all, delete-orphan"
     )
 
+    okveds = relationship(
+        "CompanyOKVED",
+        back_populates="company",
+        cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         Index("idx_company_country_system", "country_code", "system_status"),
         Index("idx_company_legal_status", "legal_status"),
         Index("idx_company_system_status", "system_status"),
+        Index("idx_company_id", "id"),
     )
 
     def add_field(
-        self,
-        company_field_type_id: UUID,
-        is_translatable: bool,
-        ru_data: Optional[str] = None,
-        en_data: Optional[str] = None,
-        json_data: dict = None,
-        datetime_data: Optional[datetime] = None,
-        translation_mode: Optional[TranslationMode] = None,
+            self,
+            company_field_type_id: UUID,
+            is_translatable: bool,
+            translations: Optional[dict[str, str]] = None,  # Новый параметр для переводов
+            json_data: dict = None,
+            code: str = None,
+            datetime_data: Optional[datetime] = None,
+            translation_mode: Optional[TranslationMode] = None,
     ) -> "CompanyField":
+        # Создаем поле без ru_data/en_data
         field = CompanyField(
             company_id=self.id,
             company_field_type_id=company_field_type_id,
-            ru_data=ru_data,
-            en_data=en_data,
             json_data=json_data,
+            code=code,
             datetime_data=datetime_data,
             is_translatable=is_translatable,
             translation_mode=translation_mode,
         )
         self.fields.append(field)
+
+        # Добавляем переводы, если поле транслируемое
+        if is_translatable and translations:
+            for lang, data in translations.items():
+                field.translations.append(
+                    FieldTranslation(
+                        language_code=lang,
+                        data=data
+                    )
+                )
         return field
 
-    def add_manager(self, manager: "Manager") -> "Manager":
+    def add_manager(
+            self,
+            manager: "Manager",
+            translations: Optional[dict[str, str]] = None  # Новый параметр
+    ) -> "Manager":
         manager.company_id = self.id
         self.managers.append(manager)
+
+        # Добавляем переводы
+        if translations:
+            for lang, full_name in translations.items():
+                manager.translations.append(
+                    ManagerTranslation(
+                        language_code=lang,
+                        full_name=full_name
+                    )
+                )
+
         return manager
+
+    # Новый метод для добавления переводов компании
+    def add_translation(
+            self,
+            language_code: str,
+            name: str,
+            description: Optional[str] = None,
+    ) -> "CompanyTranslation":
+        translation = CompanyTranslation(
+            company_id=self.id,
+            language_code=language_code,
+            name=name,
+            description=description,
+        )
+        self.translations.append(translation)
+        return translation
 
     def add_contact(self, contact: "Contact") -> "Contact":
         contact.company_id = self.id
@@ -100,7 +148,7 @@ class Company(Base):
         return tax_report
 
     def add_financial_report(
-        self, financial_report: "FinancialReport"
+            self, financial_report: "FinancialReport"
     ) -> "FinancialReport":
         financial_report.company_id = self.id
         self.financial_reports.append(financial_report)
@@ -112,12 +160,12 @@ class Company(Base):
         return self
 
     def log_change(
-        self,
-        entity_type: EntityType,
-        entity_id: UUID,
-        user_id: int,
-        changes: dict,
-        reason: str = None,
+            self,
+            entity_type: EntityType,
+            entity_id: UUID,
+            user_id: int,
+            changes: dict,
+            reason: str = None,
     ):
         log_entry = CompanyChangeLog(
             company_id=self.id,
@@ -136,9 +184,8 @@ class CompanyTranslation(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
     language_code = Column(String(2), nullable=False)
+    name = Column(Text, nullable=False)
     description = Column(Text, nullable=True)
-    legal_description = Column(Text, nullable=True)
-    advantages = Column(Text, nullable=True)
 
     __table_args__ = (
         UniqueConstraint("company_id", "language_code", name="uq_company_lang"),
@@ -167,6 +214,7 @@ class CompanyFieldType(Base):
 
     __table_args__ = (
         Index("idx_field_type_country", "country_code"),
+        Index("idx_companyfieldtype_id", "id"),
     )
 
 
@@ -181,6 +229,7 @@ class FieldTypeTranslation(Base):
     __table_args__ = (
         UniqueConstraint("field_type_id", "language_code", name="uq_field_type_lang"),
         Index("idx_ft_translation_name", "name"),
+        Index("idx_fieldtypetranslation_composite", "field_type_id", "language_code", "name"),
     )
 
     field_type = relationship("CompanyFieldType", back_populates="translations")
@@ -213,6 +262,7 @@ class CompanyField(Base):
         UUID(as_uuid=True), ForeignKey("company_field_type.id"), nullable=False
     )
     json_data = Column(JSONB, nullable=True)
+    code = Column(Text, nullable=True)
     datetime_data = Column(DateTime(timezone=True), nullable=True)
     is_translatable = Column(Boolean, nullable=False, default=False)
     translation_mode = Column(
@@ -227,6 +277,8 @@ class CompanyField(Base):
 
     __table_args__ = (
         Index("idx_company_field_company_type", "company_id", "company_field_type_id"),
+        Index("idx_companyfield_company_id", "company_id"),  # Новый индекс
+        Index("idx_companyfield_type_id", "company_field_type_id"),
     )
 
 
@@ -240,6 +292,7 @@ class FieldTranslation(Base):
     __table_args__ = (
         UniqueConstraint("field_id", "language_code", name="uq_field_lang"),
         Index("idx_field_translation_data", "data"),
+        Index("idx_fieldtranslation_composite", "field_id", "language_code", "data"),
     )
 
     field = relationship("CompanyField", back_populates="translations")
@@ -251,6 +304,8 @@ class CompanyOKVED(Base):
     company_id = Column(UUID(as_uuid=True), ForeignKey("companies.id"), nullable=False)
     okved_id = Column(Integer, ForeignKey("okved_nodes.id"), nullable=False)
 
+    company = relationship("Company", back_populates="okveds")
+    okved = relationship("OkvedNode", back_populates="companies")
 
 class Manager(Base):
     __tablename__ = "managers"

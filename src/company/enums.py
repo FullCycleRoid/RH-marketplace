@@ -59,6 +59,7 @@ class DataType(str, Enum):
     BOOLEAN = "BOOLEAN"
     ARRAY = "ARRAY"
     OBJECT = "OBJECT"
+    CODE = "CODE"
 
 
 class FiledStatus(str, Enum):

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, NullPool
 from sqlalchemy.orm import sessionmaker
 
 async_postgres_uri = f"postgresql+psycopg2://cluster:cluster@localhost:15432/cluster_db"
@@ -19,3 +19,15 @@ MarketplaceDBSession = sessionmaker(
     expire_on_commit=False,
     autocommit=False,
 )
+
+
+ASYNC_POSTGRES_URI = "postgresql+psycopg2://admin:password123@localhost:25432/monolith"
+
+def create_session():
+    """Create a new SQLAlchemy session in child processes."""
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    engine = create_engine(ASYNC_POSTGRES_URI)
+    Session = sessionmaker(bind=engine)
+    return Session
