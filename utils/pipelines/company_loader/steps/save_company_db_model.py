@@ -1,8 +1,8 @@
 from src.core.database.postgres.session_manager import DatabaseSessionManager
 from src.core.logger import logger
 
-from pipelines.generic_pipeline import Context, NextStep, PipelineStep
-from pipelines.utils import get_company_by_inn
+from utils.pipelines.generic_pipeline import Context, NextStep, PipelineStep
+from utils.pipelines.utils import get_company_by_inn
 from src import (Company, CompanyOKVED, FinancialReport,
                  TaxReport, FieldTranslation, Manager, ManagerTranslation, Contact)
 from src.company.enums import TranslationMode

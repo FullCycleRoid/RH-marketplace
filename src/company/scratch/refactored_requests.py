@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from sqlalchemy.orm import Session, joinedload
 
-from pipelines.connector import MarketplaceDBSession
+from utils.pipelines.connector import MarketplaceDBSession
 from src import Company, CompanyField, CompanyFieldType, CompanyOKVED, Manager, FieldTypeTranslation
 
 

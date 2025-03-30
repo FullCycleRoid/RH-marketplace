@@ -1,5 +1,5 @@
-from pipelines.company_loader.dto import Contact
-from pipelines.generic_pipeline import Context, NextStep, PipelineStep
+from utils.pipelines.company_loader.dto import Contact
+from utils.pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from src.company.enums import ContactType
 
 

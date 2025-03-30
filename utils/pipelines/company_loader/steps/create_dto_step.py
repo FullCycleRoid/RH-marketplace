@@ -1,6 +1,6 @@
-from pipelines.company_loader.context import CompanyDTO
 from src.core.database.postgres.session_manager import DatabaseSessionManager
-from pipelines.generic_pipeline import Context, NextStep, PipelineStep
+from utils.pipelines.company_loader.context import CompanyDTO
+from utils.pipelines.generic_pipeline import Context, NextStep, PipelineStep
 from src.company.enums import SystemStatus
 from src.company.scratch.sql_scratch import RawCompanyQueryManager
 

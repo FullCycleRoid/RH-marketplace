@@ -7,10 +7,10 @@ from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from pipelines.connector import MarketplaceDBSession
+from utils.pipelines.connector import MarketplaceDBSession
 from src import CatalogCategory
 from src.core.language_translator.google_translator import (
-    translate_large_text, translate_text)
+    translate_large_text)
 
 
 def load_classifier(path: str) -> dict:

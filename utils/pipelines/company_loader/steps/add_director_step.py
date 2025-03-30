@@ -1,6 +1,6 @@
-from pipelines.company_loader.dto import Manager
-from pipelines.generic_pipeline import Context, NextStep, PipelineStep
-from pipelines.utils import convert_ru_date_to_date_obj
+from utils.pipelines.company_loader.dto import Manager
+from utils.pipelines.generic_pipeline import Context, NextStep, PipelineStep
+from utils.pipelines.utils import convert_ru_date_to_date_obj
 from src.company.enums import ManagerType
 
 

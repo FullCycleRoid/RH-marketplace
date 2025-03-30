@@ -6,10 +6,9 @@ from typing import List, Optional
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
-from pipelines.connector import ClusterDBSession, MarketplaceDBSession
-from pipelines.raw_model import RawCompany
-from src import Company, CompanyField, CompanyFieldType, OkvedNode, FieldTypeTranslation, FieldTranslation, \
-    CompanyOKVED, Manager
+from utils.pipelines.connector import ClusterDBSession, MarketplaceDBSession
+from utils.pipelines.raw_model import RawCompany
+from src import Company, CompanyField, CompanyFieldType, OkvedNode, FieldTypeTranslation, FieldTranslation
 from src.core.logger import logger
 
 

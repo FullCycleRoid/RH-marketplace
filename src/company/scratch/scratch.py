@@ -1,12 +1,10 @@
 from pprint import pprint
 from time import time
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session, joinedload, contains_eager
-from sqlalchemy import and_, or_
+from sqlalchemy.orm import Session, joinedload
 
-from pipelines.connector import MarketplaceDBSession
-from src import Company, CompanyField, CompanyFieldType, Manager, CompanyOKVED, FieldTranslation, FieldTypeTranslation, \
-    ManagerTranslation
+from utils.pipelines.connector import MarketplaceDBSession
+from src import Company, CompanyField, CompanyFieldType, Manager, CompanyOKVED, FieldTranslation
 
 
 class CompanySerializer:

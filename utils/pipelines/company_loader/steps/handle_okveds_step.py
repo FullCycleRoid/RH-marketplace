@@ -1,6 +1,4 @@
-import json
-
-from pipelines.generic_pipeline import Context, NextStep
+from utils.pipelines.generic_pipeline import Context, NextStep
 
 
 class HandleOKVEDSStep:

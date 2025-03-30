@@ -3,34 +3,24 @@ import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from typing import Dict, List
 
-from pipelines.company_loader.context import CompanyContext
-from pipelines.company_loader.steps.add_director_step import AddDirectorStep
-from pipelines.company_loader.steps.save_company_db_model import \
-    BuildCompanyDBModelStep
-from pipelines.company_loader.steps.convert_registration_date import \
-    ConvertRegistrationDateStep
-from pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep
-from pipelines.company_loader.steps.handle_advantages_step import \
-    HandleAdvantagesStep
-from pipelines.company_loader.steps.handle_authorized_capital import \
-    ConvertAuthorizedCapitalStep
-from pipelines.company_loader.steps.handle_average_number_of_employees import \
-    ConvertAverageNumberOfEmployeesStep
-from pipelines.company_loader.steps.handle_contacts_step import \
-    HandleContactsStep
-from pipelines.company_loader.steps.handle_financial_reports_step import \
-    HandleFinancialReportStep
-from pipelines.company_loader.steps.handle_reliability_assessment_step import \
-    HandleReliabilityAssessmentStep
-from pipelines.company_loader.steps.handle_tax_reports_step import \
-    HandleTaxReportStep
-from pipelines.company_loader.steps.match_legal_status_step import \
-    MatchLegalStateStep
-from pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
-from pipelines.generic_pipeline import Context, Pipeline, error_handler
-from pipelines.utils import get_active_companies, get_all_field_types
-from src import CompanyFieldType
 
+from src import CompanyFieldType
+from utils.pipelines.company_loader.context import CompanyContext
+from utils.pipelines.company_loader.steps.add_director_step import AddDirectorStep
+from utils.pipelines.company_loader.steps.convert_registration_date import ConvertRegistrationDateStep
+from utils.pipelines.company_loader.steps.create_dto_step import CreateCompanyDTOStep
+from utils.pipelines.company_loader.steps.handle_advantages_step import HandleAdvantagesStep
+from utils.pipelines.company_loader.steps.handle_authorized_capital import ConvertAuthorizedCapitalStep
+from utils.pipelines.company_loader.steps.handle_average_number_of_employees import ConvertAverageNumberOfEmployeesStep
+from utils.pipelines.company_loader.steps.handle_contacts_step import HandleContactsStep
+from utils.pipelines.company_loader.steps.handle_financial_reports_step import HandleFinancialReportStep
+from utils.pipelines.company_loader.steps.handle_reliability_assessment_step import HandleReliabilityAssessmentStep
+from utils.pipelines.company_loader.steps.handle_tax_reports_step import HandleTaxReportStep
+from utils.pipelines.company_loader.steps.match_legal_status_step import MatchLegalStateStep
+from utils.pipelines.company_loader.steps.okved_step import OkvedM2MIdsStep
+from utils.pipelines.company_loader.steps.save_company_db_model import BuildCompanyDBModelStep
+from utils.pipelines.generic_pipeline import Pipeline, Context, error_handler
+from utils.pipelines.utils import get_all_field_types, get_active_companies
 
 BATCH_SIZE = 100_000
 MAX_COMPANIES = 20_000_000
@@ -86,7 +76,7 @@ def process_batch_multiprocess(batch, field_type_ids, error_handler):
     ctx = multiprocessing.get_context("spawn")
 
     with ProcessPoolExecutor(
-            max_workers=100,
+            max_workers=40,
             mp_context=ctx
     ) as executor:
         futures = [
@@ -143,7 +133,7 @@ def load_proxies(file_path: str) -> List[str]:
 
 
 def start_process():
-    OFFSET = 0
+    OFFSET = 300_000
     start_process_time = time.perf_counter()
 
     field_type_ids = match_field_type_names()

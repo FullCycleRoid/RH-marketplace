@@ -2,9 +2,9 @@ from pprint import pprint
 
 from sqlalchemy.exc import DatabaseError
 
-from pipelines.company_loader.okved_mapper import OkvedMapper
-from pipelines.generic_pipeline import Context, NextStep, PipelineStep
-from pipelines.utils import get_okved_by_code
+from utils.pipelines.company_loader.okved_mapper import OkvedMapper
+from utils.pipelines.generic_pipeline import Context, NextStep, PipelineStep
+from utils.pipelines.utils import get_okved_by_code
 
 
 class OkvedM2MIdsStep(PipelineStep):

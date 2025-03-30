@@ -4,9 +4,6 @@ import re
 import time
 import urllib.parse
 import urllib.request
-from typing import List
-
-from pipelines.utils import get_random_proxy_obj
 
 agent = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -65,23 +62,3 @@ def translate_large_text(
         translate(chunk, from_lang, to_lang, proxy_obj) for chunk in chunks
     ]
     return " ".join(translated_chunks)
-
-
-# if __name__ == "__main__":
-#     def load_proxies(file_path: str) -> List[str]:
-#         with open(file_path, 'r') as f:
-#             lines = f.readlines()
-#             return [f"https://{proxy.strip()}" for proxy in lines]
-#
-#     try:
-#         load_proxies = load_proxies("../../../proxylist.txt")
-#         pr = get_random_proxy_obj(load_proxies)
-#         result = translate(
-#             "Hello world",
-#             to_language="ru",
-#             from_language="en",
-#             proxies=pr
-#         )
-#         print("Перевод:", result)
-#     except Exception as e:
-#         print("Final error:", str(e))

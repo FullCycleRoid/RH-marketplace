@@ -1,4 +1,4 @@
-from pipelines.generic_pipeline import Context, NextStep
+from utils.pipelines.generic_pipeline import Context, NextStep
 
 ru_to_en = {
     "ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ": {

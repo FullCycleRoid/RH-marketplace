@@ -1,11 +1,6 @@
-from pprint import pprint
-from time import time
 from typing import List, Optional, Dict
 from sqlalchemy import text
-from sqlalchemy.orm import Session, sessionmaker
-
-from pipelines.connector import MarketplaceDBSession
-
+from sqlalchemy.orm import Session
 
 get_by_inn_stmt = """
 WITH company_data AS (

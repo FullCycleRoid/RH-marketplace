@@ -1,5 +1,5 @@
 src/core/language_translator/models
-pipelines/company_loader/jobs/models
+utils/pipelines/company_loader/jobs/models
 
 
 # Byte-compiled / optimized / DLL files

@@ -1,17 +1,10 @@
-import random
-import re
-from datetime import datetime
 from pprint import pprint
-from typing import List, Optional
 
-from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload, contains_eager
 
-from pipelines.connector import ClusterDBSession, MarketplaceDBSession
-from pipelines.raw_model import RawCompany
-from src import Company, CompanyField, CompanyFieldType, OkvedNode, FieldTypeTranslation, FieldTranslation, \
-    CompanyOKVED, Manager
-from src.core.logger import logger
+from utils.pipelines.connector import MarketplaceDBSession
+from src import Company, CompanyField, CompanyFieldType, FieldTranslation, \
+    Manager
 
 
 def get_company_by_id_marketplace(company_id: str, lang: str = 'RU', _session: Session = MarketplaceDBSession):
